@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/search.py:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
