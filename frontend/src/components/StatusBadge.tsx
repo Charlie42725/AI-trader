@@ -29,7 +29,7 @@ export default function StatusBadge({ status }: { status: JobStatus }) {
   return (
     <span className={`badge ${c.bg} ${c.text}`}>
       {status === "running" && (
-        <span className="w-1.5 h-1.5 rounded-full bg-current pulse-dot" />
+        <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-current animate-pulse" />
       )}
       {c.label}
     </span>

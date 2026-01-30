@@ -51,40 +51,43 @@ export default function NewAnalysisPage() {
   };
 
   return (
-    <div className="px-4 pt-6">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold">新增分析</h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1">設定分析參數</p>
+    <div className="container-padding pt-6 md:pt-8">
+      <header className="mb-6 md:mb-8">
+        <h1 className="page-title">新增分析</h1>
+        <p className="text-[var(--text-secondary)] text-sm md:text-base mt-1">設定分析參數</p>
       </header>
 
-      <div className="space-y-6">
-        {/* 股票代碼 */}
-        <div>
-          <label className="block text-sm font-medium mb-2">股票代碼</label>
-          <input
-            type="text"
-            value={ticker}
-            onChange={(e) => setTicker(e.target.value.toUpperCase())}
-            placeholder="例如：NVDA"
-            className="w-full px-4 py-3 font-mono text-lg uppercase"
-          />
-        </div>
+      <div className="space-y-6 md:space-y-8">
+        {/* 股票代碼與日期 - 桌面端並排 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {/* 股票代碼 */}
+          <div>
+            <label className="block text-sm md:text-base font-medium mb-2 md:mb-3">股票代碼</label>
+            <input
+              type="text"
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value.toUpperCase())}
+              placeholder="例如：NVDA"
+              className="w-full px-4 py-3 md:py-3.5 font-mono text-lg uppercase"
+            />
+          </div>
 
-        {/* 日期 */}
-        <div>
-          <label className="block text-sm font-medium mb-2">分析日期</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full px-4 py-3"
-          />
+          {/* 日期 */}
+          <div>
+            <label className="block text-sm md:text-base font-medium mb-2 md:mb-3">分析日期</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full px-4 py-3 md:py-3.5"
+            />
+          </div>
         </div>
 
         {/* 分析團隊 */}
         <div>
-          <label className="block text-sm font-medium mb-2">分析團隊</label>
-          <div className="grid grid-cols-2 gap-2">
+          <label className="block text-sm md:text-base font-medium mb-2 md:mb-3">分析團隊</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
             {analysts.map((a) => {
               const active = selected.includes(a.value);
               return (
@@ -92,16 +95,18 @@ export default function NewAnalysisPage() {
                   key={a.value}
                   type="button"
                   onClick={() => toggle(a.value)}
-                  className={`p-3 rounded-xl text-left transition-colors ${
-                    active
+                  className={`
+                    p-3 md:p-4 rounded-xl text-left transition-colors cursor-pointer
+                    ${active
                       ? "bg-[var(--primary)]/20 border border-[var(--primary)]/50"
-                      : "bg-[var(--bg-surface)] border border-[var(--border)]"
-                  }`}
+                      : "bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-light)]"
+                    }
+                  `}
                 >
-                  <p className={`font-medium text-sm ${active ? "text-[var(--primary)]" : ""}`}>
+                  <p className={`font-medium text-sm md:text-base ${active ? "text-[var(--primary)]" : ""}`}>
                     {a.label}
                   </p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">{a.desc}</p>
+                  <p className="text-xs md:text-sm text-[var(--text-muted)] mt-0.5">{a.desc}</p>
                 </button>
               );
             })}
@@ -110,8 +115,8 @@ export default function NewAnalysisPage() {
 
         {/* 研究深度 */}
         <div>
-          <label className="block text-sm font-medium mb-2">研究深度</label>
-          <div className="grid grid-cols-3 gap-2">
+          <label className="block text-sm md:text-base font-medium mb-2 md:mb-3">研究深度</label>
+          <div className="grid grid-cols-3 gap-2 md:gap-3">
             {depthOptions.map((d) => {
               const active = depth === d.value;
               return (
@@ -119,16 +124,18 @@ export default function NewAnalysisPage() {
                   key={d.value}
                   type="button"
                   onClick={() => setDepth(d.value)}
-                  className={`p-3 rounded-xl text-center transition-colors ${
-                    active
+                  className={`
+                    p-3 md:p-4 rounded-xl text-center transition-colors cursor-pointer
+                    ${active
                       ? "bg-[var(--primary)]/20 border border-[var(--primary)]/50"
-                      : "bg-[var(--bg-surface)] border border-[var(--border)]"
-                  }`}
+                      : "bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-light)]"
+                    }
+                  `}
                 >
-                  <p className={`font-medium text-sm ${active ? "text-[var(--primary)]" : ""}`}>
+                  <p className={`font-medium text-sm md:text-base ${active ? "text-[var(--primary)]" : ""}`}>
                     {d.label}
                   </p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">{d.desc}</p>
+                  <p className="text-xs md:text-sm text-[var(--text-muted)] mt-0.5">{d.desc}</p>
                 </button>
               );
             })}
@@ -137,7 +144,7 @@ export default function NewAnalysisPage() {
 
         {/* 錯誤訊息 */}
         {error && (
-          <div className="p-3 rounded-xl bg-[var(--danger)]/20 text-[var(--danger)] text-sm">
+          <div className="p-3 md:p-4 rounded-xl bg-[var(--danger)]/20 text-[var(--danger)] text-sm md:text-base">
             {error}
           </div>
         )}
@@ -146,7 +153,7 @@ export default function NewAnalysisPage() {
         <button
           onClick={submit}
           disabled={loading || !ticker.trim() || selected.length === 0}
-          className="btn btn-primary w-full disabled:opacity-50"
+          className="btn btn-primary w-full md:w-auto md:min-w-[200px] md:mx-auto md:flex disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>

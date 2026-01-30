@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
-import Onboarding from "@/components/Onboarding"; // 新增導入
+import Onboarding from "@/components/Onboarding";
 
 export const metadata: Metadata = {
   title: "TradingAgents",
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
@@ -24,11 +24,11 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="antialiased">
-        <Onboarding /> {/* 新增：放在最上方 */}
-        <div className="app-container">
-          {children}
-        </div>
+        <Onboarding />
         <BottomNav />
+        <main className="app-container">
+          {children}
+        </main>
       </body>
     </html>
   );
