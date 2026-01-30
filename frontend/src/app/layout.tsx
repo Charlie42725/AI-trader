@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import Onboarding from "@/components/Onboarding"; // 新增導入
 
 export const metadata: Metadata = {
   title: "TradingAgents",
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="antialiased">
+        <Onboarding /> {/* 新增：放在最上方 */}
         <div className="app-container">
           {children}
         </div>

@@ -1,222 +1,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-/* ===== TradingAgents App 設計系統 ===== */
+/* ===== TradingAgents App 設計系統 - Apple 一頁敘事版 ===== */
 
 :root {
-  --primary: #3B82F6;
-  --primary-dark: #2563EB;
-  --accent: #F59E0B;
-
-  --success: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-
-  --bg-app: #0D1117;
-  --bg-surface: #161B22;
-  --bg-card: #21262D;
-  --bg-elevated: #30363D;
-
+  --primary: #007AFF;
+  --primary-dark: #0056b3;
+  --primary-glow: rgba(0, 122, 255, 0.5);
+  --bg-app: #000000;
   --text-primary: #F0F6FC;
-  --text-secondary: #8B949E;
-  --text-muted: #6E7681;
-
-  --border: #30363D;
-  --border-light: #21262D;
-
   --font-sans: 'Noto Sans TC', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  box-sizing: border-box;
 }
 
 html, body {
   height: 100%;
-  overscroll-behavior: none;
-}
-
-body {
+  overflow: hidden; /* 保持隱藏主頁面捲軸 */
   background: var(--bg-app);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.5;
 }
 
-/* App 容器 */
-.app-container {
-  min-height: 100vh;
-  padding-bottom: calc(72px + var(--safe-bottom));
+/* --- 滾動優化：移除 Snap 磁吸，改為純平滑長捲軸 --- */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: auto; /* 在長捲軸敘事中，auto 能讓手指控制更直覺 */
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-/* 表單元素 */
-input, select, textarea {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  border-radius: 12px;
-  font-size: 16px;
-  transition: border-color 0.15s;
+/* --- 背景與遮罩 --- */
+.himalaya-mask {
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 95%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 95%);
 }
 
-input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  outline: none;
+/* 優化背景過渡：縮短時間讓線性連動更即時 */
+.bg-transition-apple {
+  transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1), 
+              filter 0.8s cubic-bezier(0.2, 0, 0.2, 1),
+              opacity 0.6s ease-in-out;
 }
 
-input::placeholder {
-  color: var(--text-muted);
+/* --- 動畫特效 --- */
+.hero-title {
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  background: linear-gradient(to bottom, #ffffff 60%, #444444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
 }
 
-/* 卡片 */
-.card {
-  background: var(--bg-surface);
-  border-radius: 16px;
-  border: 1px solid var(--border-light);
+@keyframes text-shimmer {
+  from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-/* 按鈕 */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: all 0.15s;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-primary:active {
-  background: var(--primary-dark);
-  transform: scale(0.98);
-}
-
-.btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-
-/* 底部導航欄 */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(72px + var(--safe-bottom));
-  padding-bottom: var(--safe-bottom);
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-light);
-  z-index: 100;
-}
-
-/* 標籤樣式 */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* Markdown */
-.prose {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.prose h1, .prose h2, .prose h3 {
-  color: var(--text-primary);
-  font-weight: 600;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-}
-
-.prose h2 { font-size: 1.1em; }
-.prose h3 { font-size: 1em; }
-
-.prose p { margin: 0.75em 0; }
-
-.prose strong { color: var(--text-primary); }
-
-.prose code {
-  background: var(--bg-card);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  color: var(--accent);
-}
-
-.prose ul, .prose ol {
-  margin: 0.5em 0;
-  padding-left: 1.5em;
-}
-
-.prose li { margin: 0.25em 0; }
-
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 13px;
-}
-
-.prose th, .prose td {
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.prose th {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-/* 動畫 */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-in {
-  animation: fade-in 0.2s ease-out;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.pulse-dot {
-  animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-/* 減少動畫 */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+.animate-text-shimmer {
+  animation: text-shimmer 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
