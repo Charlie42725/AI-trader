@@ -37,6 +37,7 @@ let mockJobs: AnalysisJob[] = [
       },
       final_trade_decision: "## 最終交易決策\n\n### 結論：買入 NVDA\n\n| 項目 | 內容 |\n|------|------|\n| 訊號 | **買入** |\n| 目標價 | $550 |\n| 止損價 | $420 |\n| 倉位 | 5% |\n| 信心度 | 85% |\n\n**理由摘要**：AI 趨勢確定，龍頭地位穩固，技術面支持。",
     },
+    progress: null,
   },
   {
     id: "mock-2",
@@ -73,6 +74,7 @@ let mockJobs: AnalysisJob[] = [
       },
       final_trade_decision: "## 最終決策\n\n**持有**：等待更明確的訊號。",
     },
+    progress: null,
   },
   {
     id: "mock-3",
@@ -86,6 +88,16 @@ let mockJobs: AnalysisJob[] = [
     completed_at: null,
     error: null,
     result: null,
+    progress: [
+      { key: "market_analyst", label: "市場分析師", status: "done", content: "## 市場分析\n\nTSLA 技術面分析完成。" },
+      { key: "social_analyst", label: "社群情緒分析師", status: "running", content: null },
+      { key: "news_analyst", label: "新聞分析師", status: "pending", content: null },
+      { key: "invest_debate", label: "多空辯論", status: "pending", content: null },
+      { key: "research_manager", label: "研究主管決策", status: "pending", content: null },
+      { key: "trader", label: "交易員決策", status: "pending", content: null },
+      { key: "risk_debate", label: "風險辯論", status: "pending", content: null },
+      { key: "final_decision", label: "最終決策", status: "pending", content: null },
+    ],
   },
   {
     id: "mock-4",
@@ -99,6 +111,7 @@ let mockJobs: AnalysisJob[] = [
     completed_at: null,
     error: null,
     result: null,
+    progress: null,
   },
 ];
 
@@ -183,6 +196,7 @@ export const mockApi = {
       completed_at: null,
       error: null,
       result: null,
+      progress: null,
     };
     mockJobs.unshift(newJob);
     return { id: newJob.id };
@@ -190,4 +204,4 @@ export const mockApi = {
 };
 
 // 是否使用 Mock 模式
-export const USE_MOCK = true;
+export const USE_MOCK = false;

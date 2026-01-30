@@ -7,6 +7,7 @@ import { AnalysisJob } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import DecisionBadge from "@/components/DecisionBadge";
 import ReportSection from "@/components/ReportSection";
+import ProgressTracker from "@/components/ProgressTracker";
 
 function isTerminal(status: string) {
   return status === "completed" || status === "failed";
@@ -95,22 +96,27 @@ export default function AnalysisDetailPage() {
       <div className="max-w-3xl mx-auto">
         {/* 分析中狀態 */}
         {(job.status === "pending" || job.status === "running") && (
-          <div className="container-padding py-12 md:py-16">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-20 h-20 md:w-24 md:h-24 mb-6 md:mb-8">
+          <div className="container-padding py-8 md:py-12">
+            <div className="flex flex-col items-center text-center mb-6 md:mb-8">
+              <div className="relative w-16 h-16 md:w-20 md:h-20 mb-4 md:mb-6">
                 <div className="absolute inset-0 border-4 border-[var(--border)] rounded-full" />
                 <div className="absolute inset-0 border-4 border-transparent border-t-[var(--primary)] rounded-full animate-spin" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <svg className="w-8 h-8 md:w-10 md:h-10 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7 md:w-8 md:h-8 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-lg md:text-xl font-semibold mb-2">AI 正在分析中</h3>
-              <p className="text-[var(--text-secondary)] text-sm md:text-base">
-                {job.status === "pending" ? "等待處理..." : "分析進行中，每 3 秒自動更新"}
+              <h3 className="text-lg md:text-xl font-semibold mb-1">AI 正在分析中</h3>
+              <p className="text-[var(--text-secondary)] text-xs md:text-sm">
+                {job.status === "pending" ? "等待處理..." : "分析進行中，點擊已完成步驟可查看內容"}
               </p>
             </div>
+
+            {/* Progress tracker */}
+            {job.progress && job.progress.length > 0 && (
+              <ProgressTracker steps={job.progress} />
+            )}
           </div>
         )}
 

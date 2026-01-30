@@ -2,6 +2,15 @@ export type AnalystType = "market" | "social" | "news" | "fundamentals";
 
 export type JobStatus = "pending" | "running" | "completed" | "failed";
 
+export type StepStatus = "pending" | "running" | "done";
+
+export interface ProgressStep {
+  key: string;
+  label: string;
+  status: StepStatus;
+  content: string | null;
+}
+
 export interface AnalysisRequest {
   ticker: string;
   date: string;
@@ -51,6 +60,7 @@ export interface AnalysisJob {
   completed_at: string | null;
   result: AnalysisResult | null;
   error: string | null;
+  progress: ProgressStep[] | null;
 }
 
 export interface JobSummary {

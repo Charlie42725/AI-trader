@@ -5,7 +5,12 @@
       "Bash(PYTHONIOENCODING=utf-8 python:*)",
       "Bash(npm run build:*)",
       "Bash(ls:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(pip show:*)",
+      "Bash(tree:*)",
+      "Bash(find /mnt/c/Users/linei/Desktop/coding/TradingAgents/tradingagents -type d -exec sh -c 'if [ ! -f \"\"$1/__init__.py\"\" ]; then echo \"\"Missing __init__.py: $1\"\"; fi' _ {} ;)",
+      "Bash(find:*)",
+      "Bash(dir:*)"
     ]
   }
 }

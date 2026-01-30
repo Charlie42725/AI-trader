@@ -21,6 +21,19 @@ class JobStatus(str, enum.Enum):
     failed = "failed"
 
 
+class StepStatus(str, enum.Enum):
+    pending = "pending"
+    running = "running"
+    done = "done"
+
+
+class ProgressStep(BaseModel):
+    key: str
+    label: str
+    status: StepStatus = StepStatus.pending
+    content: Optional[str] = None  # 該步驟產出的內容（報告、辯論等）
+
+
 # ── Request ──────────────────────────────────────────────────────────────────
 
 class AnalysisRequest(BaseModel):
@@ -81,6 +94,7 @@ class AnalysisJob(BaseModel):
     completed_at: Optional[datetime] = None
     result: Optional[AnalysisResult] = None
     error: Optional[str] = None
+    progress: Optional[list[ProgressStep]] = None
 
 
 # ── Response summaries ───────────────────────────────────────────────────────
