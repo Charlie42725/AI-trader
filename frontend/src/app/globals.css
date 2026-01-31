@@ -59,7 +59,7 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
   background: var(--bg-app);
   color: var(--text-primary);
   font-family: var(--font-sans);

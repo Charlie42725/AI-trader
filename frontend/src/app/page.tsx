@@ -1,12 +1,23 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { listAnalyses } from "@/lib/api";
 import { usePolling } from "@/hooks/usePolling";
 import AnalysisCard from "@/components/AnalysisCard";
+import { 
+  RocketLaunchIcon, 
+  CpuChipIcon, 
+  ChartBarIcon, 
+  ArrowTrendingUpIcon,
+  GlobeAltIcon,
+  NewspaperIcon,
+  XMarkIcon,
+  InformationCircleIcon
+} from "@heroicons/react/24/outline";
 
 export default function HomePage() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const fetcher = useCallback(() => listAnalyses(), []);
   const { data: jobs, loading } = usePolling(fetcher, 10_000);
 
@@ -18,78 +29,224 @@ export default function HomePage() {
       }
     : null;
 
+  const steps = [
+    { 
+      icon: GlobeAltIcon, 
+      label: "數據抓取", 
+      color: "text-yellow-400",
+      desc: "Yahoo Finance, Reuters 等多源數據" 
+    },
+    { 
+      icon: NewspaperIcon, 
+      label: "深度解析", 
+      color: "text-blue-400",
+      desc: "新聞情緒評分與財報關鍵指標過濾" 
+    },
+    { 
+      icon: ChartBarIcon, 
+      label: "加權計算", 
+      color: "text-purple-400",
+      desc: "排除市場噪音，計算最終信心指數" 
+    },
+    { 
+      icon: ArrowTrendingUpIcon, 
+      label: "決策輸出", 
+      color: "text-[#02c076]",
+      desc: "精準產出 BUY / SELL 交易訊號建議" 
+    },
+  ];
+
   return (
-    <div className="container-padding pt-6 md:pt-8">
-      {/* 頂部標題 */}
-      <header className="mb-6 md:mb-8">
-        <h1 className="page-title">交易分析</h1>
-        <p className="text-[var(--text-secondary)] text-sm md:text-base mt-1">
-          AI 智能分析助手
-        </p>
-      </header>
-
-      {/* 統計卡片 */}
-      {stats && stats.total > 0 && (
-        <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-          <div className="card p-4 md:p-6 text-center">
-            <p className="text-2xl md:text-3xl font-bold">{stats.total}</p>
-            <p className="text-xs md:text-sm text-[var(--text-muted)] mt-1">總數</p>
-          </div>
-          <div className="card p-4 md:p-6 text-center">
-            <p className="text-2xl md:text-3xl font-bold text-[var(--success)]">{stats.completed}</p>
-            <p className="text-xs md:text-sm text-[var(--text-muted)] mt-1">完成</p>
-          </div>
-          <div className="card p-4 md:p-6 text-center">
-            <p className="text-2xl md:text-3xl font-bold text-[var(--primary)]">{stats.running}</p>
-            <p className="text-xs md:text-sm text-[var(--text-muted)] mt-1">進行中</p>
-          </div>
+    <main className="min-h-screen bg-[#0b0e11] text-[#eaecef] pb-24">
+      {/* 1. 頂部即時市場跑馬燈 */}
+      <div className="bg-[#1e2329] py-2 overflow-hidden border-b border-gray-800 flex items-center">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {["BTC/USDT +1.2%", "ETH/USDT -0.5%", "NVDA/USD +2.3%", "XAU/USD +0.1%", "SOL/USDT +4.5%"].map((ticker, i) => (
+            <span key={i} className="mx-6 text-[10px] font-mono tracking-tighter">
+              <span className="text-gray-400">{ticker.split(' ')[0]}</span>
+              <span className={ticker.includes('+') ? "text-[#02c076] ml-1" : "text-[#f84960] ml-1"}>
+                {ticker.split(' ')[1]}
+              </span>
+            </span>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* 載入中 */}
-      {loading && !jobs && (
-        <div className="flex flex-col items-center py-20 md:py-28">
-          <div className="w-10 h-10 md:w-12 md:h-12 border-3 border-[var(--border)] border-t-[var(--primary)] rounded-full animate-spin" />
-          <p className="text-[var(--text-muted)] text-sm md:text-base mt-4">載入中...</p>
-        </div>
-      )}
-
-      {/* 空狀態 */}
-      {jobs && jobs.length === 0 && (
-        <div className="card p-8 md:p-12 text-center">
-          <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-[var(--bg-card)] flex items-center justify-center mb-4 md:mb-6">
-            <svg className="w-8 h-8 md:w-10 md:h-10 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+      <div className="container-padding pt-6 max-w-2xl mx-auto">
+        {/* 2. 標題與價值主張 */}
+        <header className="mb-6 flex justify-between items-end">
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">TRADING AGENT</h1>
+            <p className="text-gray-400 text-xs mt-1">多種 AI 專家幫你整合</p>
           </div>
-          <h3 className="font-semibold text-lg md:text-xl mb-2">尚無分析紀錄</h3>
-          <p className="text-[var(--text-secondary)] text-sm md:text-base mb-6 md:mb-8">
-            點擊下方按鈕開始您的第一個分析
-          </p>
-          <Link href="/new" className="btn btn-primary">
-            開始分析
+          <div className="text-right hidden sm:block">
+            <span className="inline-flex items-center px-2 py-1 rounded bg-gray-800 text-[10px] text-yellow-400 border border-yellow-400/30">
+              <span className="relative flex h-2 w-2 mr-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
+              </span>
+              AI Agents Online
+            </span>
+          </div>
+        </header>
+
+        {/* 3. 核心功能區 (瘦身版按鈕) */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link href="/new" className="group relative bg-yellow-400 hover:bg-yellow-500 p-4 rounded-xl flex flex-col justify-between transition-all overflow-hidden h-32">
+            <RocketLaunchIcon className="w-8 h-8 text-black/20 self-end" />
+            <div>
+              <h3 className="text-black font-black text-lg italic leading-none">START</h3>
+              <p className="text-black/60 text-[10px] font-bold uppercase mt-1">啟動 AI 分析</p>
+            </div>
+          </Link>
+          
+          <Link href="/history" className="bg-[#1e2329] border border-gray-800 p-4 rounded-xl flex flex-col justify-between hover:bg-[#2b3139] transition-all h-32">
+            <HistoryIcon className="w-8 h-8 text-gray-700 self-end" />
+            <div>
+              <h3 className="text-white font-bold text-lg leading-none">HISTORY</h3>
+              <p className="text-gray-400 text-[10px] uppercase mt-1">過往決策報表</p>
+            </div>
           </Link>
         </div>
-      )}
 
-      {/* 分析列表 */}
-      {jobs && jobs.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-base md:text-lg">最近分析</h2>
-            <Link href="/history" className="text-sm md:text-base text-[var(--primary)] hover:underline">
-              查看全部
-            </Link>
+        {/* 4. AI 數據分析流程圖 (折疊滑動版) */}
+        <div 
+          onClick={() => setIsDrawerOpen(true)}
+          className="bg-[#1e2329] rounded-xl p-4 border border-gray-800 mb-6 cursor-pointer hover:border-gray-600 transition-colors group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+              <CpuChipIcon className="w-3 h-3 mr-1 text-yellow-400" />
+              AI 引擎處理流程
+            </h2>
+            <InformationCircleIcon className="w-4 h-4 text-gray-600 group-hover:text-yellow-400" />
           </div>
-          <div className="space-y-3 md:space-y-4">
-            {jobs.slice(0, 5).map((job, i) => (
-              <div key={job.id} className="animate-in" style={{ animationDelay: `${i * 50}ms` }}>
-                <AnalysisCard job={job} />
+          
+          <div className="flex overflow-x-auto no-scrollbar gap-6 items-center">
+            {steps.map((step, i) => (
+              <div key={i} className="flex-none flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-[#0b0e11] rounded-full flex items-center justify-center mb-1 border border-gray-800">
+                    <step.icon className={`w-5 h-5 ${step.color}`} />
+                  </div>
+                  <span className="text-[10px] text-gray-400 whitespace-nowrap">{step.label}</span>
+                </div>
+                {i < steps.length - 1 && (
+                  <div className="ml-6 h-[1px] w-4 bg-gray-800" />
+                )}
               </div>
             ))}
           </div>
         </div>
-      )}
-    </div>
+
+        {/* 5. 抽屜式詳細說明 (BottomSheet) */}
+        {isDrawerOpen && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center px-4">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsDrawerOpen(false)} />
+<div className="relative bg-[#1e2329] w-full max-w-lg rounded-t-3xl p-6 pb-24 shadow-2xl border-t border-gray-700 animate-in fade-in slide-in-from-bottom-10 duration-300">              <div className="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6" />
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-white">數據處理流程</h3>
+                  <p className="text-gray-400 text-xs mt-1">了解 AI 如何從原始數據產出建議</p>
+                </div>
+                <button onClick={() => setIsDrawerOpen(false)} className="p-2 hover:bg-gray-800 rounded-full">
+                  <XMarkIcon className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {steps.map((step, i) => (
+                  <div key={i} className="flex gap-4 p-4 bg-[#0b0e11] rounded-2xl border border-gray-800">
+                    <div className={`w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0`}>
+                      <step.icon className={`w-7 h-7 ${step.color}`} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">{step.label}</h4>
+                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <button 
+                onClick={() => setIsDrawerOpen(false)}
+                className="w-full mt-6 py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-2xl transition-colors"
+              >
+                返回主頁
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 6. 統計數據條 */}
+        {stats && stats.total > 0 && (
+          <div className="flex gap-6 mb-8 px-2 border-l-2 border-yellow-400/50">
+            <div>
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">TOTAL TASKS</p>
+              <p className="text-xl font-mono">{stats.total}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">SUCCESS</p>
+              <p className="text-xl font-mono text-[#02c076]">{stats.completed}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">ACTIVE</p>
+              <p className="text-xl font-mono text-yellow-400">{stats.running}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 7. 最近分析清單 */}
+        <div>
+          <div className="flex items-center justify-between mb-4 px-1">
+            <h2 className="font-bold text-sm text-gray-300 uppercase tracking-widest">最近監控標的</h2>
+            <Link href="/history" className="text-xs text-yellow-400 hover:text-yellow-500 transition-colors">市場全覽 &rarr;</Link>
+          </div>
+
+          <div className="space-y-2">
+            {loading && !jobs ? (
+              <div className="py-20 flex justify-center">
+                <div className="w-8 h-8 border-2 border-yellow-400/20 border-t-yellow-400 rounded-full animate-spin" />
+              </div>
+            ) : jobs?.length === 0 ? (
+              <div className="bg-[#1e2329] p-10 rounded-2xl text-center border border-dashed border-gray-800">
+                <p className="text-gray-500 text-sm italic">等待指令中... 請輸入標的以啟動 AI</p>
+              </div>
+            ) : (
+              jobs?.slice(0, 5).map((job) => (
+                <div key={job.id} className="transition-transform active:scale-[0.98]">
+                  <AnalysisCard job={job} />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </main>
+  );
+}
+
+function HistoryIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   );
 }
