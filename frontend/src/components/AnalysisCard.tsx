@@ -1,11 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { JobSummary } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
 
-const signalLabels: Record<string, { text: string; color: string }> = {
-  BUY: { text: "買入", color: "text-[var(--success)]" },
-  SELL: { text: "賣出", color: "text-[var(--danger)]" },
-  HOLD: { text: "持有", color: "text-[var(--warning)]" },
+const signalLabels: Record<string, { text: string; color: string; bg: string }> = {
+  BUY: { text: "買入", color: "text-orange-600", bg: "bg-orange-50" },
+  SELL: { text: "賣出", color: "text-black", bg: "bg-gray-100" }, // 賣出改用黑白色調強調對比
+  HOLD: { text: "持有", color: "text-gray-500", bg: "bg-gray-50" },
 };
 
 export default function AnalysisCard({ job }: { job: JobSummary }) {
@@ -15,35 +17,43 @@ export default function AnalysisCard({ job }: { job: JobSummary }) {
   return (
     <Link
       href={`/analysis/${job.id}`}
-      className="card block p-4 md:p-5 active:bg-[var(--bg-card)] md:hover:bg-[var(--bg-surface)]/80 transition-colors cursor-pointer"
+      className="block p-4 md:p-5 bg-white border border-gray-100 hover:border-orange-500 transition-all cursor-pointer active:scale-[0.98] shadow-sm mb-2"
     >
       <div className="flex items-center gap-4">
-        {/* 股票代碼圖標 */}
-        <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-[var(--bg-card)] flex items-center justify-center flex-shrink-0">
-          <span className="text-lg md:text-xl font-bold font-mono text-[var(--primary)]">
+        {/* 股票代碼圖標 - 改為黑底橘字，增加硬派感 */}
+        <div className="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-black flex items-center justify-center flex-shrink-0">
+          <span className="text-lg md:text-xl font-black font-mono text-orange-500">
             {job.ticker.slice(0, 2)}
           </span>
         </div>
 
-        {/* 資訊 */}
+        {/* 資訊區 - 純黑文字與灰色副標 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-semibold md:text-lg">{job.ticker}</span>
+            <span className="font-black text-black md:text-lg tracking-tight uppercase">
+              {job.ticker}
+            </span>
             <StatusBadge status={job.status} />
           </div>
-          <p className="text-sm md:text-base text-[var(--text-muted)] mt-0.5">{job.date}</p>
+          <p className="text-xs md:text-sm text-gray-400 font-bold mt-0.5 uppercase tracking-wider">
+            {job.date}
+          </p>
         </div>
 
-        {/* 訊號 / 箭頭 */}
+        {/* 訊號 / 箭頭 - 橘色強化 */}
         <div className="flex-shrink-0">
           {signalInfo ? (
-            <span className={`text-lg md:text-xl font-bold ${signalInfo.color}`}>
-              {signalInfo.text}
-            </span>
+            <div className={`px-3 py-1 rounded-sm ${signalInfo.bg} border border-transparent`}>
+               <span className={`text-sm md:text-base font-black ${signalInfo.color}`}>
+                {signalInfo.text}
+              </span>
+            </div>
           ) : (
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <div className="p-2 bg-gray-50 rounded-full group-hover:bg-orange-500 group-hover:text-white transition-colors">
+              <svg className="w-5 h-5 text-gray-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           )}
         </div>
       </div>

@@ -222,14 +222,17 @@ html, body {
   border-color: var(--border-light);
 }
 
-/* 輸入框樣式 */
+/* 輸入框樣式 - 已移除背景與邊框限制，允許 Page.tsx 的 Tailwind 生效 */
 input[type="text"],
 input[type="date"] {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
   color: var(--text-primary);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+}
+
+/* 僅保留 Focus 時的全域效果，避免衝突 */
+input[type="text"]:focus,
+input[type="date"]:focus {
+  outline: none;
 }
 
 input[type="text"]:focus,
