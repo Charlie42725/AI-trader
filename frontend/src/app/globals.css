@@ -7,7 +7,7 @@
   --primary: #007AFF;
   --primary-dark: #0056b3;
   --primary-glow: rgba(0, 122, 255, 0.5);
-  --bg-app: #000000;
+  --bg-app: #ffffff;
   --bg-surface: #0d0d0d;
   --bg-card: #1a1a1a;
   --bg-elevated: #242424;
@@ -222,14 +222,15 @@ html, body {
   border-color: var(--border-light);
 }
 
-/* 輸入框樣式 - 已移除背景與邊框限制，允許 Page.tsx 的 Tailwind 生效 */
+/* 輸入框樣式 - 移除全域背景與邊框以相容各頁面設計 */
 input[type="text"],
 input[type="date"] {
-  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  color: black;
   transition: all 0.2s ease;
 }
 
-/* 僅保留 Focus 時的全域效果，避免衝突 */
 input[type="text"]:focus,
 input[type="date"]:focus {
   outline: none;

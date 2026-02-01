@@ -27,6 +27,12 @@ export default function NewAnalysisPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 設置日期範圍限制：最遠追溯 7 天，最新到今天
+  const maxDateStr = new Date().toISOString().slice(0, 10);
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() - 7);
+  const minDateStr = minDate.toISOString().slice(0, 10);
+
   const toggle = (a: AnalystType) => {
     setSelected((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
   };
@@ -52,7 +58,7 @@ export default function NewAnalysisPage() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-24 text-black selection:bg-orange-100">
-      {/* 頂部極細裝飾線 - 增加精緻感 */}
+      {/* 頂部極細裝飾線 */}
       <div className="h-[2px] bg-gray-100 w-full flex">
         <div className="w-1/3 h-full bg-orange-500" />
       </div>
@@ -71,7 +77,7 @@ export default function NewAnalysisPage() {
         </header>
 
         <div className="space-y-16">
-          {/* 第一區塊：輸入框 - 已修改為 gray-200 (水泥灰) */}
+          {/* 第一區塊：輸入框 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="group">
               <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 transition-colors group-focus-within:text-orange-500">
@@ -82,19 +88,21 @@ export default function NewAnalysisPage() {
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value.toUpperCase())}
                 placeholder="NVDA"
-                className="w-full bg-transparent border-b-4 border-gray-300 focus:border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none placeholder:text-gray-200"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none placeholder:text-gray-800"
               />
             </div>
 
             <div className="group">
               <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 transition-colors group-focus-within:text-orange-500">
-                選擇研究日期
+                選擇研究日期 (限制 7 天內)
               </label>
               <input
                 type="date"
                 value={date}
+                min={minDateStr}
+                max={maxDateStr}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-transparent border-b-4 border-gray-200 focus:border-orange-500 transition-all px-1 py-4 font-mono text-2xl font-bold outline-none"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none text-black"
               />
             </div>
           </div>
@@ -135,34 +143,42 @@ export default function NewAnalysisPage() {
           </div>
 
           {/* 第三區塊：研究深度 */}
-          <div>
-            <label className="block text-[11px] font-black text-orange-500 uppercase tracking-widest mb-6 px-1">
-              Scanning Intensity
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {depthOptions.map((d) => {
-                const active = depth === d.value;
-                return (
-                  <button
-                    key={d.value}
-                    type="button"
-                    onClick={() => setDepth(d.value)}
-                    className={`
-                      px-8 py-4 rounded-full transition-all border-2 font-black text-sm uppercase italic tracking-wider
-                      ${active
-                        ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px_20px_-6px_rgba(249,115,22,0.4)]"
-                        : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
-                      }
-                    `}
-                  >
-                    {d.label} <span className="ml-2 text-[10px] opacity-70 font-bold not-italic">{d.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+<div className="w-full">
+  <label className="block text-[20px] font-black text-orange-500 uppercase tracking-widest mb-4 px-1">
+    分析方式
+  </label>
+  
+  {/* 修改點：改用 grid 並排，gap 縮小讓空間更緊湊 */}
+  <div className="grid grid-cols-3 gap-2">
+    {depthOptions.map((d) => {
+      const active = depth === d.value;
+      return (
+        <button
+          key={d.value}
+          type="button"
+          onClick={() => setDepth(d.value)}
+          className={`
+            w-full py-3 rounded-xl transition-all border-2 font-black text-[20px] uppercase italic tracking-tighter
+            flex flex-col items-center justify-center gap-1
+            ${active
+              ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px-20px_-6px_rgba(249,115,22,0.4)]"
+              : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+            }
+          `}
+        >
+          {/* 主標籤 */}
+          <span>{d.label}</span>
+          
+          {/* 修改點：將描述文字放在主標籤下方，增加直觀度 */}
+          <span className={`text-[15px] opacity-80 font-bold not-italic leading-none ${active ? "text-white" : "text-gray-400"}`}>
+            {d.desc}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
-          {/* 錯誤處理 */}
           {error && (
             <div className="p-5 rounded-2xl bg-white border-2 border-red-500 text-red-500 text-xs font-black uppercase tracking-widest flex items-center gap-3">
               <span className="bg-red-500 text-white px-1">Error</span>
@@ -170,7 +186,6 @@ export default function NewAnalysisPage() {
             </div>
           )}
 
-          {/* 提交按鈕 */}
           <div className="pt-8">
             <button
               onClick={submit}
@@ -178,8 +193,8 @@ export default function NewAnalysisPage() {
               className={`
                 group relative w-full md:w-auto md:min-w-[320px] h-20 rounded-2xl font-black text-xl tracking-[0.2em] uppercase italic transition-all duration-300
                 ${loading || !ticker.trim() || selected.length === 0
-                  ? "bg-gray-100 text-gray-300 cursor-not-allowed border-2 border-gray-100"
-                  : "bg-black text-white hover:bg-orange-500 hover:shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)] active:scale-95"
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed border-2 border-gray-200"
+                  : "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)] active:scale-95"
                 }
               `}
             >

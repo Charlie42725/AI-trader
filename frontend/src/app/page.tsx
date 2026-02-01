@@ -99,7 +99,7 @@ export default function HomePage() {
             <RocketLaunchIcon className="w-8 h-8 text-black/10 self-end transition-transform group-hover:scale-110" />
             <div>
               <h3 className="text-black font-black text-lg italic leading-none">分析</h3>
-              <p className="text-black/60 text-[10px] font-bold uppercase mt-1 tracking-wider">開始你的規劃</p>
+              <p className="text-black/60 text-[10px] font-bold uppercase mt-1 tracking-wider">今天想了解哪個投資標的呢</p>
             </div>
           </Link>
           
