@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // 引入路由
 import { listAnalyses } from "@/lib/api";
 import { usePolling } from "@/hooks/usePolling";
 import AnalysisCard from "@/components/AnalysisCard";
@@ -13,10 +14,12 @@ import {
   GlobeAltIcon,
   NewspaperIcon,
   XMarkIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  ChevronRightIcon
 } from "@heroicons/react/24/outline";
 
 export default function HomePage() {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const fetcher = useCallback(() => listAnalyses(), []);
   const { data: jobs, loading } = usePolling(fetcher, 10_000);
@@ -32,27 +35,27 @@ export default function HomePage() {
   const steps = [
     { 
       icon: GlobeAltIcon, 
-      label: "數據抓取", 
+      label: "多維數據抓取", 
       color: "text-yellow-400",
-      desc: "Yahoo Finance, Reuters 等多源數據" 
+      desc: "整合市場與基本面分析師，即時抓取技術指標與財報數據。" 
     },
     { 
       icon: NewspaperIcon, 
-      label: "深度解析", 
+      label: "Agents 深度解析", 
       color: "text-blue-400",
-      desc: "新聞情緒評分與財報關鍵指標過濾" 
+      desc: "新聞與社群分析師並行，解析情緒及社交媒體輿論訊號。" 
     },
     { 
-      icon: ChartBarIcon, 
-      label: "加權計算", 
+      icon: CpuChipIcon, 
+      label: "決策辯論權衡", 
       color: "text-purple-400",
-      desc: "排除市場噪音，計算最終信心指數" 
+      desc: "啟動 AI 多空辯論系統，由研究主管針對分析報告進行驗證。" 
     },
     { 
       icon: ArrowTrendingUpIcon, 
-      label: "決策輸出", 
+      label: "交易訊號輸出", 
       color: "text-[#02c076]",
-      desc: "精準產出 BUY / SELL 交易訊號建議" 
+      desc: "首席交易員根據風險辯論結果，產出精準的買賣執行建議。" 
     },
   ];
 
@@ -76,8 +79,8 @@ export default function HomePage() {
         {/* 2. 標題與價值主張 */}
         <header className="mb-6 flex justify-between items-end">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">TRADING AGENT</h1>
-            <p className="text-gray-400 text-xs mt-1">多種 AI 專家幫你整合</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight italic">TRADING AGENT</h1>
+            <p className="text-gray-400 text-xs mt-1">多種 AI 專家幫你整合並自動化決策</p>
           </div>
           <div className="text-right hidden sm:block">
             <span className="inline-flex items-center px-2 py-1 rounded bg-gray-800 text-[10px] text-yellow-400 border border-yellow-400/30">
@@ -90,13 +93,13 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* 3. 核心功能區 (瘦身版按鈕) */}
+        {/* 3. 核心功能區 */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Link href="/new" className="group relative bg-yellow-400 hover:bg-yellow-500 p-4 rounded-xl flex flex-col justify-between transition-all overflow-hidden h-32">
-            <RocketLaunchIcon className="w-8 h-8 text-black/20 self-end" />
+            <RocketLaunchIcon className="w-8 h-8 text-black/20 self-end transition-transform group-hover:scale-110" />
             <div>
               <h3 className="text-black font-black text-lg italic leading-none">START</h3>
-              <p className="text-black/60 text-[10px] font-bold uppercase mt-1">啟動 AI 分析</p>
+              <p className="text-black/60 text-[10px] font-bold uppercase mt-1 tracking-wider">啟動 AI 分析</p>
             </div>
           </Link>
           
@@ -104,12 +107,12 @@ export default function HomePage() {
             <HistoryIcon className="w-8 h-8 text-gray-700 self-end" />
             <div>
               <h3 className="text-white font-bold text-lg leading-none">HISTORY</h3>
-              <p className="text-gray-400 text-[10px] uppercase mt-1">過往決策報表</p>
+              <p className="text-gray-400 text-[10px] uppercase mt-1 tracking-wider">過往決策報表</p>
             </div>
           </Link>
         </div>
 
-        {/* 4. AI 數據分析流程圖 (折疊滑動版) */}
+        {/* 4. AI 數據分析流程圖 (入口) */}
         <div 
           onClick={() => setIsDrawerOpen(true)}
           className="bg-[#1e2329] rounded-xl p-4 border border-gray-800 mb-6 cursor-pointer hover:border-gray-600 transition-colors group"
@@ -117,7 +120,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
               <CpuChipIcon className="w-3 h-3 mr-1 text-yellow-400" />
-              AI 引擎處理流程
+              AI 引擎處理流程 (點擊了解詳情)
             </h2>
             <InformationCircleIcon className="w-4 h-4 text-gray-600 group-hover:text-yellow-400" />
           </div>
@@ -126,7 +129,7 @@ export default function HomePage() {
             {steps.map((step, i) => (
               <div key={i} className="flex-none flex items-center">
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 bg-[#0b0e11] rounded-full flex items-center justify-center mb-1 border border-gray-800">
+                  <div className="w-10 h-10 bg-[#0b0e11] rounded-full flex items-center justify-center mb-1 border border-gray-800 group-hover:border-yellow-400/30 transition-colors">
                     <step.icon className={`w-5 h-5 ${step.color}`} />
                   </div>
                   <span className="text-[10px] text-gray-400 whitespace-nowrap">{step.label}</span>
@@ -139,40 +142,52 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 5. 抽屜式詳細說明 (BottomSheet) */}
+        {/* 5. 抽屜式詳細說明 (互動按鈕化) */}
         {isDrawerOpen && (
           <div className="fixed inset-0 z-50 flex items-end justify-center px-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsDrawerOpen(false)} />
-<div className="relative bg-[#1e2329] w-full max-w-lg rounded-t-3xl p-6 pb-24 shadow-2xl border-t border-gray-700 animate-in fade-in slide-in-from-bottom-10 duration-300">              <div className="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6" />
-              <div className="flex justify-between items-start mb-6">
+            <div className="relative bg-[#1e2329] w-full max-w-lg rounded-t-3xl p-6 pb-28 shadow-2xl border-t border-gray-700 animate-in fade-in slide-in-from-bottom-10 duration-300">
+              <div className="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6" />
+              
+              <div className="flex justify-between items-start mb-6 px-1">
                 <div>
-                  <h3 className="text-xl font-bold text-white">數據處理流程</h3>
-                  <p className="text-gray-400 text-xs mt-1">了解 AI 如何從原始數據產出建議</p>
+                  <h3 className="text-xl font-bold text-white">AI 決策透明中心</h3>
+                  <p className="text-gray-400 text-xs mt-1">點擊下方模組深入了解各 Agent 邏輯</p>
                 </div>
-                <button onClick={() => setIsDrawerOpen(false)} className="p-2 hover:bg-gray-800 rounded-full">
+                <button onClick={() => setIsDrawerOpen(false)} className="p-2 hover:bg-gray-800 rounded-full transition-colors">
                   <XMarkIcon className="w-6 h-6 text-gray-400" />
                 </button>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {steps.map((step, i) => (
-                  <div key={i} className="flex gap-4 p-4 bg-[#0b0e11] rounded-2xl border border-gray-800">
-                    <div className={`w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0`}>
+                  <button 
+                    key={i} 
+                    onClick={() => {
+                      setIsDrawerOpen(false);
+                      router.push(`/process?step=${i}`);
+                    }}
+                    className="w-full flex items-center gap-4 p-4 bg-[#0b0e11] rounded-2xl border border-gray-800 hover:border-yellow-400/50 hover:bg-[#161a1e] transition-all text-left group active:scale-[0.98]"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                       <step.icon className={`w-7 h-7 ${step.color}`} />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white">{step.label}</h4>
-                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{step.desc}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-sm font-bold text-white group-hover:text-yellow-400 transition-colors">{step.label}</h4>
+                        <ChevronRightIcon className="w-4 h-4 text-gray-600 group-hover:text-yellow-400 transition-colors" />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5 leading-relaxed line-clamp-1">{step.desc}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
               
               <button 
                 onClick={() => setIsDrawerOpen(false)}
-                className="w-full mt-6 py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-2xl transition-colors"
+                className="w-full mt-6 py-4 bg-[#1e2329] hover:bg-[#2b3139] border border-gray-700 text-gray-400 font-bold rounded-2xl transition-colors text-sm"
               >
-                返回主頁
+                關閉面板
               </button>
             </div>
           </div>
