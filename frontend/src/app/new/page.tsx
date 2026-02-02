@@ -57,18 +57,18 @@ export default function NewAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pb-24 text-black selection:bg-orange-100">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black pb-24 text-black dark:text-white selection:bg-orange-100 dark:selection:bg-orange-900 transition-colors duration-300">
       {/* 頂部極細裝飾線 */}
-      <div className="h-[2px] bg-gray-100 w-full flex">
+      <div className="h-[2px] bg-gray-100 dark:bg-white/5 w-full flex">
         <div className="w-1/3 h-full bg-orange-500" />
       </div>
-      
+
       <div className="max-w-4xl mx-auto px-6 pt-16 md:pt-20">
         <header className="mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-[1px] flex-1 bg-gray-200" />
+            <div className="h-[1px] flex-1 bg-gray-200 dark:bg-white/10" />
           </div>
-          <h1 className="text-3xl md:text-7xl font-black text-black italic uppercase tracking-tighter leading-[0.85]">
+          <h1 className="text-3xl md:text-7xl font-black text-black dark:text-white italic uppercase tracking-tighter leading-[0.85]">
             開始你的分析
           </h1>
           <p className="text-gray-400 font-bold text-sm mt-6 tracking-tight uppercase">
@@ -88,7 +88,7 @@ export default function NewAnalysisPage() {
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value.toUpperCase())}
                 placeholder="NVDA"
-                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none placeholder:text-gray-800"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 dark:focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none placeholder:text-gray-800 dark:placeholder:text-gray-600 dark:text-white"
               />
             </div>
 
@@ -123,8 +123,8 @@ export default function NewAnalysisPage() {
                     className={`
                       relative p-6 rounded-2xl text-left transition-all duration-300 border-2
                       ${active
-                        ? "bg-white border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1"
-                        : "bg-white border-gray-100 text-gray-300 hover:border-gray-300 grayscale"
+                        ? "bg-white dark:bg-white border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] -translate-y-1 -translate-x-1"
+                        : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-300 dark:text-gray-600 hover:border-gray-300 dark:hover:border-white/30 grayscale"
                       }
                     `}
                   >
@@ -143,44 +143,44 @@ export default function NewAnalysisPage() {
           </div>
 
           {/* 第三區塊：研究深度 */}
-<div className="w-full">
-  <label className="block text-[20px] font-black text-orange-500 uppercase tracking-widest mb-4 px-1">
-    分析方式
-  </label>
-  
-  {/* 修改點：改用 grid 並排，gap 縮小讓空間更緊湊 */}
-  <div className="grid grid-cols-3 gap-2">
-    {depthOptions.map((d) => {
-      const active = depth === d.value;
-      return (
-        <button
-          key={d.value}
-          type="button"
-          onClick={() => setDepth(d.value)}
-          className={`
+          <div className="w-full">
+            <label className="block text-[20px] font-black text-orange-500 uppercase tracking-widest mb-4 px-1">
+              分析方式
+            </label>
+
+            {/* 修改點：改用 grid 並排，gap 縮小讓空間更緊湊 */}
+            <div className="grid grid-cols-3 gap-2">
+              {depthOptions.map((d) => {
+                const active = depth === d.value;
+                return (
+                  <button
+                    key={d.value}
+                    type="button"
+                    onClick={() => setDepth(d.value)}
+                    className={`
             w-full py-3 rounded-xl transition-all border-2 font-black text-[20px] uppercase italic tracking-tighter
             flex flex-col items-center justify-center gap-1
             ${active
-              ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px-20px_-6px_rgba(249,115,22,0.4)]"
-              : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
-            }
+                        ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px-20px_-6px_rgba(249,115,22,0.4)]"
+                        : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-400 dark:text-gray-600 hover:border-gray-200 dark:hover:border-white/30"
+                      }
           `}
-        >
-          {/* 主標籤 */}
-          <span>{d.label}</span>
-          
-          {/* 修改點：將描述文字放在主標籤下方，增加直觀度 */}
-          <span className={`text-[15px] opacity-80 font-bold not-italic leading-none ${active ? "text-white" : "text-gray-400"}`}>
-            {d.desc}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-</div>
+                  >
+                    {/* 主標籤 */}
+                    <span>{d.label}</span>
+
+                    {/* 修改點：將描述文字放在主標籤下方，增加直觀度 */}
+                    <span className={`text-[15px] opacity-80 font-bold not-italic leading-none ${active ? "text-white" : "text-gray-400"}`}>
+                      {d.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {error && (
-            <div className="p-5 rounded-2xl bg-white border-2 border-red-500 text-red-500 text-xs font-black uppercase tracking-widest flex items-center gap-3">
+            <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border-2 border-red-500 text-red-500 text-xs font-black uppercase tracking-widest flex items-center gap-3">
               <span className="bg-red-500 text-white px-1">Error</span>
               {error}
             </div>
@@ -193,7 +193,7 @@ export default function NewAnalysisPage() {
               className={`
                 group relative w-full md:w-auto md:min-w-[320px] h-20 rounded-2xl font-black text-xl tracking-[0.2em] uppercase italic transition-all duration-300
                 ${loading || !ticker.trim() || selected.length === 0
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed border-2 border-gray-200"
+                  ? "bg-gray-200 dark:bg-white/10 text-gray-400 dark:text-gray-600 cursor-not-allowed border-2 border-gray-200 dark:border-white/5"
                   : "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)] active:scale-95"
                 }
               `}

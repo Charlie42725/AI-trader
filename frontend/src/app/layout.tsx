@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Link from "next/link";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import BottomNav from "@/components/BottomNav";
 import Onboarding from "@/components/Onboarding";
 
@@ -24,11 +26,13 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="antialiased">
-        <Onboarding />
-        <BottomNav />
-        <main className="app-container">
-          {children}
-        </main>
+        <ThemeProvider attribute="class">
+          <Onboarding />
+          <BottomNav />
+          <main className="app-container">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

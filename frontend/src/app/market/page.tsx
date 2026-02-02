@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  ChevronRight, Users, Settings2, ShieldCheck, TrendingUp, 
-  MessageSquare, Globe, BarChart3, CheckCircle2, X 
+import {
+  ChevronRight, Users, Settings2, ShieldCheck, TrendingUp,
+  MessageSquare, Globe, BarChart3, CheckCircle2, X
 } from "lucide-react";
 
 export default function MarketPage() {
@@ -27,24 +27,24 @@ export default function MarketPage() {
   ];
 
   return (
-    <div className="app-container bg-[#FAFAFA] min-h-screen pb-32">
+    <div className="app-container bg-[#FAFAFA] dark:bg-black min-h-screen pb-32 transition-colors duration-300">
       {/* Header */}
-      <header className="px-6 pt-12 pb-6 bg-white border-b border-gray-100">
-        <h1 className="text-2xl font-black italic tracking-tighter text-black">STRATEGY HUB</h1>
+      <header className="px-6 pt-12 pb-6 bg-white dark:bg-black border-b border-gray-100 dark:border-white/10">
+        <h1 className="text-2xl font-black italic tracking-tighter text-black dark:text-white">STRATEGY HUB</h1>
         <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-1">策略工坊 & 社群廣塲</p>
       </header>
 
       {/* Tabs */}
-      <div className="flex px-6 bg-white border-b border-gray-100">
-        <button 
+      <div className="flex px-6 bg-white dark:bg-black border-b border-gray-100 dark:border-white/10">
+        <button
           onClick={() => setActiveTab("config")}
-          className={`py-4 px-4 text-sm font-black transition-all border-b-2 ${activeTab === "config" ? "border-orange-500 text-black" : "border-transparent text-gray-400"}`}
+          className={`py-4 px-4 text-sm font-black transition-all border-b-2 ${activeTab === "config" ? "border-orange-500 text-black dark:text-white" : "border-transparent text-gray-400 dark:text-gray-600"}`}
         >
           自訂配置
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("community")}
-          className={`py-4 px-4 text-sm font-black transition-all border-b-2 ${activeTab === "community" ? "border-orange-500 text-black" : "border-transparent text-gray-400"}`}
+          className={`py-4 px-4 text-sm font-black transition-all border-b-2 ${activeTab === "community" ? "border-orange-500 text-black dark:text-white" : "border-transparent text-gray-400 dark:text-gray-600"}`}
         >
           專家社群
         </button>
@@ -62,12 +62,11 @@ export default function MarketPage() {
                   const types = ["tw", "us", "crypto"];
                   const active = marketType === types[i];
                   return (
-                    <button 
+                    <button
                       key={t}
                       onClick={() => setMarketType(types[i])}
-                      className={`py-3 rounded-xl font-black text-sm transition-all border-2 ${
-                        active ? "bg-black border-black text-white shadow-lg" : "bg-white border-gray-100 text-gray-400"
-                      }`}
+                      className={`py-3 rounded-xl font-black text-sm transition-all border-2 ${active ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black shadow-lg" : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-400 dark:text-gray-500"
+                        }`}
                     >
                       {t}
                     </button>
@@ -84,27 +83,27 @@ export default function MarketPage() {
                   <button
                     key={m.id}
                     onClick={() => setIsModalOpen(m.id)}
-                    className="flex items-center justify-between p-5 bg-white rounded-3xl border border-gray-100 shadow-sm active:scale-[0.98] transition-all text-left"
+                    className="flex items-center justify-between p-5 bg-white dark:bg-white/5 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm active:scale-[0.98] transition-all text-left group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`${m.color} bg-gray-50 p-3 rounded-2xl`}>{m.icon}</div>
+                      <div className={`${m.color} bg-gray-50 dark:bg-white/10 p-3 rounded-2xl`}>{m.icon}</div>
                       <div>
-                        <h3 className="font-black text-black">{m.label}</h3>
+                        <h3 className="font-black text-black dark:text-white">{m.label}</h3>
                         <p className="text-[10px] text-gray-400 font-bold">{m.sub}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-orange-500 bg-orange-50 px-2 py-1 rounded-md">
+                      <span className="text-[10px] font-black text-orange-500 bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded-md">
                         {configs[m.id as keyof typeof configs].length} 項設定
                       </span>
-                      <ChevronRight className="w-4 h-4 text-gray-300" />
+                      <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-orange-500 transition-colors" />
                     </div>
                   </button>
                 ))}
               </div>
             </section>
 
-            <button className="w-full py-4 bg-black text-white rounded-2xl font-black italic uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+            <button className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black italic uppercase tracking-widest shadow-xl active:scale-95 transition-all">
               儲存並套用配置
             </button>
           </div>
@@ -116,14 +115,14 @@ export default function MarketPage() {
               { name: "定投大師", winRate: "65%", followers: "3.8k", strategy: "基本面價值投資", tags: ["#Value", "#LongTerm"] },
               { name: "情緒捕手", winRate: "74%", followers: "850", strategy: "社群情緒權重 80%", tags: ["#Social", "#Meme"] },
             ].map((expert, i) => (
-              <div key={i} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+              <div key={i} className="bg-white dark:bg-white/5 p-5 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-tr from-orange-400 to-yellow-200 rounded-full flex items-center justify-center text-white font-black">
                       {expert.name[0]}
                     </div>
                     <div>
-                      <h3 className="font-black text-black">{expert.name}</h3>
+                      <h3 className="font-black text-black dark:text-white">{expert.name}</h3>
                       <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase">
                         <Users className="w-3 h-3" /> {expert.followers} 跟隨者
                       </div>
@@ -131,20 +130,20 @@ export default function MarketPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-[10px] font-black text-orange-500 uppercase">勝率預測</div>
-                    <div className="text-xl font-black italic text-black">{expert.winRate}</div>
+                    <div className="text-xl font-black italic text-black dark:text-white">{expert.winRate}</div>
                   </div>
                 </div>
-                
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs font-bold text-gray-600">使用策略：{expert.strategy}</p>
+
+                <div className="p-3 bg-gray-50 dark:bg-white/10 rounded-xl">
+                  <p className="text-xs font-bold text-gray-600 dark:text-gray-300">使用策略：{expert.strategy}</p>
                   <div className="flex gap-2 mt-2">
                     {expert.tags.map(tag => (
-                      <span key={tag} className="text-[9px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded-md">{tag}</span>
+                      <span key={tag} className="text-[9px] font-black text-blue-500 bg-blue-50 dark:bg-blue-500/20 px-2 py-1 rounded-md">{tag}</span>
                     ))}
                   </div>
                 </div>
 
-                <button className="w-full py-3 border-2 border-black rounded-xl font-black text-xs uppercase hover:bg-black hover:text-white transition-all flex items-center justify-center gap-2">
+                <button className="w-full py-3 border-2 border-black dark:border-white text-black dark:text-white rounded-xl font-black text-xs uppercase hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex items-center justify-center gap-2">
                   一鍵複製策略 <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -156,29 +155,29 @@ export default function MarketPage() {
       {/* 下彈式詳細設定視窗 */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-2xl bg-white rounded-t-[40px] p-8 animate-in slide-in-from-bottom duration-300 shadow-2xl">
+          <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-t-[40px] p-8 animate-in slide-in-from-bottom duration-300 shadow-2xl border-t border-transparent dark:border-white/10">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-black italic tracking-tighter">
+              <h2 className="text-xl font-black italic tracking-tighter text-black dark:text-white">
                 {modules.find(m => m.id === isModalOpen)?.label} 配置
               </h2>
-              <button onClick={() => setIsModalOpen(null)} className="p-2 bg-gray-100 rounded-full">
-                <X className="w-4 h-4 text-gray-500" />
+              <button onClick={() => setIsModalOpen(null)} className="p-2 bg-gray-100 dark:bg-white/10 rounded-full">
+                <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3 mb-8 max-h-[40vh] overflow-y-auto pr-2 no-scrollbar">
               {/* 這裡之後可根據 ID 渲染不同內容 */}
               {["指標自動權重", "深度情緒過濾", "歷史數據校正", "AI 代理人辯論模式"].map((opt) => (
-                <div key={opt} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 active:bg-gray-100 transition-all">
-                  <span className="font-bold text-gray-700">{opt}</span>
+                <div key={opt} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 active:bg-gray-100 dark:active:bg-white/10 transition-all cursor-pointer">
+                  <span className="font-bold text-gray-700 dark:text-gray-300">{opt}</span>
                   <CheckCircle2 className="text-orange-500 w-5 h-5" />
                 </div>
               ))}
             </div>
 
-            <button 
+            <button
               onClick={() => setIsModalOpen(null)}
-              className="w-full py-4 bg-black text-white rounded-2xl font-black uppercase tracking-widest italic"
+              className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase tracking-widest italic"
             >
               確認並更新模組
             </button>

@@ -26,6 +26,18 @@
   --nav-height: 72px;
 }
 
+.dark {
+  --bg-app: #0d0d0d;
+  --bg-surface: #1a1a1a;
+  --bg-card: #242424;
+  --bg-elevated: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border: #27272a;
+  --border-light: #3f3f46;
+}
+
 /* 平板以上增加間距 */
 @media (min-width: 768px) {
   :root {
