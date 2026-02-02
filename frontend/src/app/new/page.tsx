@@ -123,17 +123,17 @@ export default function NewAnalysisPage() {
                     className={`
                       relative p-6 rounded-2xl text-left transition-all duration-300 border-2
                       ${active
-                        ? "bg-white dark:bg-white border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] -translate-y-1 -translate-x-1"
+                        ? "bg-white dark:bg-gray-800 border-black dark:border-gray-600 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)] -translate-y-1 -translate-x-1"
                         : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-300 dark:text-gray-600 hover:border-gray-300 dark:hover:border-white/30 grayscale"
                       }
                     `}
                   >
                     {active && <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />}
                     <div className="text-3xl mb-5">{a.icon}</div>
-                    <p className={`font-black text-base tracking-tighter ${active ? "text-black" : "text-gray-300"}`}>
+                    <p className={`font-black text-base tracking-tighter ${active ? "text-black dark:text-white" : "text-gray-300 dark:text-gray-600"}`}>
                       {a.label}
                     </p>
-                    <p className={`text-[10px] font-bold mt-1 ${active ? "text-orange-500" : "text-gray-200"}`}>
+                    <p className={`text-[10px] font-bold mt-1 ${active ? "text-orange-500" : "text-gray-200 dark:text-gray-700"}`}>
                       {a.desc}
                     </p>
                   </button>
