@@ -16,7 +16,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -58,7 +58,7 @@ export default function ProfilePage() {
     ];
 
     return (
-        <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white pb-24 transition-colors duration-300">
+        <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white pb-32 transition-colors duration-300">
             {/* 1. Header */}
             <header className="container-padding pt-6 pb-4 max-w-2xl mx-auto border-b border-gray-50 dark:border-white/10">
                 <h1 className="text-2xl font-black text-black dark:text-white tracking-tight italic uppercase px-4">我的帳戶</h1>
@@ -112,11 +112,11 @@ export default function ProfilePage() {
                             <div className="bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 overflow-hidden">
                                 {/* Dark Mode Toggle (Insert in First Group) */}
                                 {groupIndex === 0 && mounted && (
-                                    <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5 hover:bg-white dark:hover:bg-white/5 transition-colors group cursor-pointer"
-                                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                                    <button className="w-full flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5 hover:bg-white dark:hover:bg-white/5 transition-colors group cursor-pointer"
+                                        onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
                                         <div className="flex items-center gap-3">
                                             <div className="p-1.5 rounded bg-white dark:bg-white/10 border border-gray-100 dark:border-white/5 group-hover:border-orange-200 dark:group-hover:border-orange-500/50 transition-colors">
-                                                {theme === 'dark' ?
+                                                {resolvedTheme === 'dark' ?
                                                     <MoonIcon className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-orange-500 transition-colors" /> :
                                                     <SunIcon className="w-5 h-5 text-gray-500 group-hover:text-orange-500 transition-colors" />
                                                 }
@@ -124,9 +124,9 @@ export default function ProfilePage() {
                                             <span className="text-sm font-bold text-black dark:text-white">深色模式</span>
                                         </div>
                                         <div className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 bg-gray-200 dark:bg-orange-600">
-                                            <span className={`${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
+                                            <span className={`${resolvedTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
                                         </div>
-                                    </div>
+                                    </button>
                                 )}
 
                                 {group.items.map((item, i) => (
@@ -164,6 +164,6 @@ export default function ProfilePage() {
                 </div>
 
             </div>
-        </main>
+        </div>
     );
 }

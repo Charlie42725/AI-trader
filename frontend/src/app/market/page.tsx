@@ -27,7 +27,7 @@ export default function MarketPage() {
   ];
 
   return (
-    <div className="app-container bg-[#FAFAFA] dark:bg-black min-h-screen pb-32 transition-colors duration-300">
+    <div className="app-container bg-[#FAFAFA] dark:bg-black min-h-screen pb-32 transition-colors duration-300 overflow-x-hidden">
       {/* Header */}
       <header className="px-6 pt-12 pb-6 bg-white dark:bg-black border-b border-gray-100 dark:border-white/10">
         <h1 className="text-2xl font-black italic tracking-tighter text-black dark:text-white">STRATEGY HUB</h1>
@@ -35,7 +35,7 @@ export default function MarketPage() {
       </header>
 
       {/* Tabs */}
-      <div className="flex px-6 bg-white dark:bg-black border-b border-gray-100 dark:border-white/10">
+      <div className="flex px-4 md:px-6 bg-white dark:bg-black border-b border-gray-100 dark:border-white/10 overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab("config")}
           className={`py-4 px-4 text-sm font-black transition-all border-b-2 ${activeTab === "config" ? "border-orange-500 text-black dark:text-white" : "border-transparent text-gray-400 dark:text-gray-600"}`}

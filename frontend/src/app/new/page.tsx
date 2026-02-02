@@ -57,7 +57,7 @@ export default function NewAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black pb-24 text-black dark:text-white selection:bg-orange-100 dark:selection:bg-orange-900 transition-colors duration-300">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black pb-32 text-black dark:text-white selection:bg-orange-100 dark:selection:bg-orange-900 transition-colors duration-300">
       {/* 頂部極細裝飾線 */}
       <div className="h-[2px] bg-gray-100 dark:bg-white/5 w-full flex">
         <div className="w-1/3 h-full bg-orange-500" />
@@ -88,7 +88,7 @@ export default function NewAnalysisPage() {
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value.toUpperCase())}
                 placeholder="NVDA"
-                className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 dark:focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none placeholder:text-gray-800 dark:placeholder:text-gray-600 dark:text-white"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 dark:focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none placeholder:text-gray-800 dark:placeholder:text-gray-600 dark:text-white"
               />
             </div>
 
@@ -102,7 +102,7 @@ export default function NewAnalysisPage() {
                 min={minDateStr}
                 max={maxDateStr}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-4xl font-black uppercase outline-none text-black"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none text-black"
               />
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function NewAnalysisPage() {
             <label className="block text-[11px] font-black text-orange-500 uppercase tracking-widest mb-6 px-1">
               設置並選取您的團隊以及分析項目
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {analysts.map((a) => {
                 const active = selected.includes(a.value);
                 return (
@@ -149,7 +149,7 @@ export default function NewAnalysisPage() {
             </label>
 
             {/* 修改點：改用 grid 並排，gap 縮小讓空間更緊湊 */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {depthOptions.map((d) => {
                 const active = depth === d.value;
                 return (
@@ -158,7 +158,7 @@ export default function NewAnalysisPage() {
                     type="button"
                     onClick={() => setDepth(d.value)}
                     className={`
-            w-full py-3 rounded-xl transition-all border-2 font-black text-[20px] uppercase italic tracking-tighter
+            w-full py-3 rounded-xl transition-all border-2 font-black text-lg md:text-[20px] uppercase italic tracking-tighter
             flex flex-col items-center justify-center gap-1
             ${active
                         ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px-20px_-6px_rgba(249,115,22,0.4)]"

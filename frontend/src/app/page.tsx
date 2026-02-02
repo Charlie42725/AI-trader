@@ -60,7 +60,7 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-white dark:bg-black text-black dark:text-gray-100 pb-24 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-gray-100 pb-32 transition-colors duration-300">
       {/* 1. 頂部即時市場跑馬燈 (改為白底黑字) */}
       <div className="bg-gray-50 dark:bg-white/5 py-2 overflow-hidden border-b border-gray-100 dark:border-white/5 flex items-center">
         <div className="flex animate-marquee whitespace-nowrap">
@@ -187,8 +187,9 @@ export default function HomePage() {
         )}
 
         {/* 6. 統計數據條 (改為橘色裝飾) */}
+        {/* 6. 統計數據條 (改為橘色裝飾) */}
         {stats && stats.total > 0 && (
-          <div className="flex gap-6 mb-8 px-2 border-l-4 border-orange-500">
+          <div className="grid grid-cols-3 gap-2 mb-8 px-2 border-l-4 border-orange-500">
             <div>
               <p className="text-gray-400 text-[10px] uppercase font-black tracking-widest">觀察數量</p>
               <p className="text-xl font-black text-black dark:text-white">{stats.total}</p>
@@ -247,7 +248,7 @@ export default function HomePage() {
           scrollbar-width: none;
         }
       `}</style>
-    </main>
+    </div>
   );
 }
 
