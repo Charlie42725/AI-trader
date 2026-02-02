@@ -69,9 +69,17 @@
   }
 }
 
-html, body {
+/* Safe Area Utility */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+html,
+body {
   height: 100%;
   overflow: auto;
+  background-color: var(--bg-app);
+  /* Use background-color specifically */
   background: var(--bg-app);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -79,7 +87,9 @@ html, body {
 
 /* 桌面端允許主體滾動 */
 @media (min-width: 768px) {
-  html, body {
+
+  html,
+  body {
     overflow: auto;
   }
 }
@@ -88,9 +98,11 @@ html, body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  scroll-behavior: auto; /* 在長捲軸敘事中，auto 能讓手指控制更直覺 */
+  scroll-behavior: auto;
+  /* 在長捲軸敘事中，auto 能讓手指控制更直覺 */
   -webkit-overflow-scrolling: touch;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -103,9 +115,9 @@ html, body {
 
 /* 優化背景過渡：縮短時間讓線性連動更即時 */
 .bg-transition-apple {
-  transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1), 
-              filter 0.8s cubic-bezier(0.2, 0, 0.2, 1),
-              opacity 0.6s ease-in-out;
+  transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1),
+    filter 0.8s cubic-bezier(0.2, 0, 0.2, 1),
+    opacity 0.6s ease-in-out;
 }
 
 /* --- 動畫特效 --- */
@@ -117,12 +129,21 @@ html, body {
   background: linear-gradient(to bottom, #ffffff 60%, #444444);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
 }
 
 @keyframes text-shimmer {
-  from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 .animate-text-shimmer {
@@ -256,6 +277,7 @@ input[type="date"]:focus {
 }
 
 @media (min-width: 768px) {
+
   input[type="text"],
   input[type="date"] {
     border-radius: 0.875rem;
@@ -298,6 +320,7 @@ input[type="date"]:focus {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -398,7 +421,12 @@ input[type="date"]:focus {
   }
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
   color: var(--text-primary);
   font-weight: 600;
   margin-top: 1.5em;
@@ -406,10 +434,21 @@ input[type="date"]:focus {
   line-height: 1.3;
 }
 
-.prose h1 { font-size: 1.5em; }
-.prose h2 { font-size: 1.25em; }
-.prose h3 { font-size: 1.125em; }
-.prose h4 { font-size: 1em; }
+.prose h1 {
+  font-size: 1.5em;
+}
+
+.prose h2 {
+  font-size: 1.25em;
+}
+
+.prose h3 {
+  font-size: 1.125em;
+}
+
+.prose h4 {
+  font-size: 1em;
+}
 
 .prose p {
   margin-bottom: 1em;
@@ -420,7 +459,8 @@ input[type="date"]:focus {
   font-weight: 600;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   padding-left: 1.5em;
   margin-bottom: 1em;
 }
@@ -489,7 +529,8 @@ input[type="date"]:focus {
   margin-bottom: 1em;
 }
 
-.prose th, .prose td {
+.prose th,
+.prose td {
   border: 1px solid var(--border);
   padding: 0.5em 0.75em;
   text-align: left;
@@ -534,6 +575,7 @@ input[type="date"]:focus {
 
 /* ===== 動態減速偏好 ===== */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
