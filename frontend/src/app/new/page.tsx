@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { startAnalysis } from "@/lib/api";
 import { AnalystType } from "@/lib/types";
 
-const analysts: { value: AnalystType; label: string; desc: string; icon: string }[] = [
-  { value: "market", label: "市場分析", desc: "技術指標", icon: "📈" },
-  { value: "social", label: "社群情緒", desc: "輿情分析", icon: "💬" },
-  { value: "news", label: "新聞分析", desc: "即時新聞", icon: "🗞️" },
-  { value: "fundamentals", label: "基本面", desc: "財務數據", icon: "📊" },
+// 擴充數據來源資訊，但不改動原本的 label 和 desc
+const analysts: { value: AnalystType; label: string; desc: string; icon: string; sources: string[] }[] = [
+  { value: "market", label: "市場分析", desc: "技術指標", icon: "📈", sources: ["Yahoo Finance", "Binance"] },
+  { value: "social", label: "社群情緒", desc: "輿情分析", icon: "💬", sources: ["X", "Reddit"] },
+  { value: "news", label: "新聞分析", desc: "即時新聞", icon: "🗞️", sources: ["Google News", "CryptoPanic"] },
+  { value: "fundamentals", label: "基本面", desc: "財務數據", icon: "📊", sources: ["SEC Filings", "CoinGecko"] },
 ];
 
 const depthOptions = [
@@ -18,19 +19,22 @@ const depthOptions = [
   { value: 3, label: "深度", desc: "完整辯論" },
 ];
 
+const hotTickers = ["NVDA", "TSLA", "AAPL", "BTC", "ETH", "SOL"];
+
 export default function NewAnalysisPage() {
   const router = useRouter();
   const [ticker, setTicker] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selected, setSelected] = useState<AnalystType[]>(["market", "social", "news", "fundamentals"]);
   const [depth, setDepth] = useState(2);
+  const [isLiveMode, setIsLiveMode] = useState(true); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 設置日期範圍限制：最遠追溯 7 天，最新到今天
+  // 設置日期範圍限制：最遠追溯 30 天
   const maxDateStr = new Date().toISOString().slice(0, 10);
   const minDate = new Date();
-  minDate.setDate(minDate.getDate() - 7);
+  minDate.setDate(minDate.getDate() - 30); 
   const minDateStr = minDate.toISOString().slice(0, 10);
 
   const toggle = (a: AnalystType) => {
@@ -44,7 +48,7 @@ export default function NewAnalysisPage() {
     try {
       const { id } = await startAnalysis({
         ticker: ticker.trim().toUpperCase(),
-        date,
+        date: isLiveMode ? maxDateStr : date,
         analysts: selected,
         max_debate_rounds: depth,
         max_risk_discuss_rounds: depth,
@@ -78,36 +82,90 @@ export default function NewAnalysisPage() {
 
         <div className="space-y-16">
           {/* 第一區塊：輸入框 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="space-y-6">
             <div className="group">
               <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 transition-colors group-focus-within:text-orange-500">
                 輸入股票代號或投資標的
               </label>
-              <input
-                type="text"
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value.toUpperCase())}
-                placeholder="NVDA"
-                className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 dark:focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none placeholder:text-gray-800 dark:placeholder:text-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={ticker}
+                  onChange={(e) => setTicker(e.target.value.toUpperCase())}
+                  placeholder="NVDA"
+                  className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 dark:focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none placeholder:text-gray-800 dark:placeholder:text-gray-600 dark:text-white"
+                />
+                {ticker && (
+                  <div className="absolute right-0 bottom-4">
+                    <span className="text-[10px] font-black text-green-500 bg-green-500/10 px-2 py-1 rounded">LIVE_TRACKING</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 px-1">
+              {hotTickers.map(t => (
+                <button 
+                  key={t}
+                  type="button"
+                  onClick={() => setTicker(t)}
+                  className="px-3 py-1 border-2 border-gray-100 dark:border-white/10 rounded-full text-[10px] font-black hover:border-black dark:hover:border-white transition-colors"
+                >
+                  ${t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 第二區塊：模式切換與日期 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="group">
+              <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1 transition-colors group-focus-within:text-orange-500">
+                分析模式切換
+              </label>
+              <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-2xl border-2 border-gray-900 dark:border-white/20 transition-all">
+                <button 
+                  type="button"
+                  onClick={() => setIsLiveMode(true)}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${
+                    isLiveMode 
+                    ? 'bg-orange-500 text-white shadow-inner' 
+                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                >
+                  LIVE 實時預測
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setIsLiveMode(false)}
+                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${
+                    !isLiveMode 
+                    ? 'bg-orange-500 text-white shadow-inner' 
+                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                >
+                  HISTORY 歷史回測
+                </button>
+              </div>
             </div>
 
-            <div className="group">
-              <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 transition-colors group-focus-within:text-orange-500">
-                選擇研究日期 (限制 7 天內)
+            <div className={`group transition-all duration-500 ${isLiveMode ? 'opacity-20 pointer-events-none grayscale' : 'opacity-100'}`}>
+              <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1 transition-colors group-focus-within:text-orange-500">
+                選擇研究日期 (限制 30 天內)
               </label>
               <input
                 type="date"
                 value={date}
                 min={minDateStr}
                 max={maxDateStr}
+                disabled={isLiveMode}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-transparent !border-b-4 !border-gray-900 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none text-black"
+                className="w-full bg-transparent !border-b-4 !border-gray-900 dark:!border-white/50 focus:!border-orange-500 transition-all px-1 py-4 font-mono text-xl md:text-4xl font-black uppercase outline-none text-black dark:text-white"
               />
             </div>
           </div>
 
-          {/* 第二區塊：分析團隊 */}
+          {/* 第三區塊：分析團隊 */}
           <div>
             <label className="block text-[11px] font-black text-orange-500 uppercase tracking-widest mb-6 px-1">
               設置並選取您的團隊以及分析項目
@@ -136,19 +194,24 @@ export default function NewAnalysisPage() {
                     <p className={`text-[10px] font-bold mt-1 ${active ? "text-orange-500" : "text-gray-200 dark:text-gray-700"}`}>
                       {a.desc}
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-1">
+                      {a.sources.map(s => (
+                        <span key={s} className={`text-[7px] px-1 border rounded ${active ? 'border-orange-500/30 text-orange-500' : 'border-gray-100 dark:border-zinc-800'}`}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* 第三區塊：研究深度 */}
+          {/* 第四區塊：研究深度 */}
           <div className="w-full">
             <label className="block text-[20px] font-black text-orange-500 uppercase tracking-widest mb-4 px-1">
               分析方式
             </label>
-
-            {/* 修改點：改用 grid 並排，gap 縮小讓空間更緊湊 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {depthOptions.map((d) => {
                 const active = depth === d.value;
@@ -158,18 +221,15 @@ export default function NewAnalysisPage() {
                     type="button"
                     onClick={() => setDepth(d.value)}
                     className={`
-            w-full py-3 rounded-xl transition-all border-2 font-black text-lg md:text-[20px] uppercase italic tracking-tighter
-            flex flex-col items-center justify-center gap-1
-            ${active
+                      w-full py-3 rounded-xl transition-all border-2 font-black text-lg md:text-[20px] uppercase italic tracking-tighter
+                      flex flex-col items-center justify-center gap-1
+                      ${active
                         ? "bg-orange-500 border-orange-500 text-white shadow-[0_8px-20px_-6px_rgba(249,115,22,0.4)]"
                         : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-400 dark:text-gray-600 hover:border-gray-200 dark:hover:border-white/30"
                       }
-          `}
+                    `}
                   >
-                    {/* 主標籤 */}
                     <span>{d.label}</span>
-
-                    {/* 修改點：將描述文字放在主標籤下方，增加直觀度 */}
                     <span className={`text-[15px] opacity-80 font-bold not-italic leading-none ${active ? "text-white" : "text-gray-400"}`}>
                       {d.desc}
                     </span>
