@@ -39,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className="antialiased pt-safe">
         <ThemeProvider attribute="class">
           <Onboarding />
           <BottomNav />

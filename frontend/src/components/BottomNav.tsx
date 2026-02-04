@@ -21,8 +21,8 @@ const navItems = [
   },
   {
     href: "/new", label: "分析", icon: (active: boolean) => (
-      <div className={`p-3 rounded-full -translate-y-4 shadow-lg transition-all ${active ? "bg-orange-500 text-white" : "bg-black text-white"}`}>
-        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`p-2.5 md:p-3 rounded-full -translate-y-3 md:-translate-y-4 shadow-lg transition-all ${active ? "bg-orange-500 text-white" : "bg-black text-white"}`}>
+        <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
       </div>
@@ -51,7 +51,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#0d0d0d]/90 backdrop-blur-lg border-t border-gray-100 dark:border-white/10 z-50 pb-safe transition-colors duration-300">
-      <div className="max-w-2xl mx-auto flex items-end justify-around h-[72px]">
+      <div className="max-w-2xl mx-auto flex items-end justify-around h-[60px] md:h-[72px]">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const isCenter = item.href === "/new";
