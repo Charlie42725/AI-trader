@@ -25,9 +25,9 @@ export default function ProfilePage() {
 
     // Mock User Data
     const user = {
-        name: "Trader User",
+        name: "交易用戶",
         id: "888888",
-        plan: "PRO Plan",
+        plan: "專業版",
         avatar: null, // null will show initials
         stats: {
             analysesThisMonth: 82,

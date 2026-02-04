@@ -120,9 +120,9 @@ function ProcessContent() {
 
               <div className="flex-1 pt-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${item.color}`}>Step 0{idx + 1}</span>
+                  <span className={`text-[10px] font-bold tracking-widest ${item.color}`}>步驟 {idx + 1}</span>
                   {activeStep === idx && (
-                    <span className="bg-slate-900 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">當前焦點</span>
+                    <span className="bg-slate-900 dark:bg-white dark:text-black text-white text-[9px] px-2 py-0.5 rounded-full font-bold">當前焦點</span>
                   )}
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-1">{item.title}</h2>

@@ -10,6 +10,7 @@ let mockJobs: AnalysisJob[] = [
     status: "completed",
     max_debate_rounds: 2,
     max_risk_discuss_rounds: 2,
+    llm_provider: "openai",
     created_at: "2024-01-15T10:00:00Z",
     completed_at: "2024-01-15T10:05:00Z",
     error: null,
@@ -47,6 +48,7 @@ let mockJobs: AnalysisJob[] = [
     status: "completed",
     max_debate_rounds: 2,
     max_risk_discuss_rounds: 2,
+    llm_provider: "openai",
     created_at: "2024-01-14T09:00:00Z",
     completed_at: "2024-01-14T09:03:00Z",
     error: null,
@@ -84,6 +86,7 @@ let mockJobs: AnalysisJob[] = [
     status: "running",
     max_debate_rounds: 2,
     max_risk_discuss_rounds: 2,
+    llm_provider: "openai",
     created_at: "2024-01-13T14:00:00Z",
     completed_at: null,
     error: null,
@@ -107,6 +110,7 @@ let mockJobs: AnalysisJob[] = [
     status: "pending",
     max_debate_rounds: 2,
     max_risk_discuss_rounds: 2,
+    llm_provider: "openai",
     created_at: "2024-01-12T16:00:00Z",
     completed_at: null,
     error: null,
@@ -129,6 +133,7 @@ export const mockApi = {
       ticker: job.ticker,
       date: job.date,
       analysts: job.analysts,
+      llm_provider: job.llm_provider,
       status: job.status,
       signal: job.result?.signal ?? null,
       error: job.error,
@@ -192,6 +197,7 @@ export const mockApi = {
       status: "pending",
       max_debate_rounds: request.max_debate_rounds,
       max_risk_discuss_rounds: request.max_risk_discuss_rounds,
+      llm_provider: request.llm_provider,
       created_at: new Date().toISOString(),
       completed_at: null,
       error: null,
@@ -204,4 +210,4 @@ export const mockApi = {
 };
 
 // 是否使用 Mock 模式
-export const USE_MOCK = true;
+export const USE_MOCK = false;

@@ -59,7 +59,7 @@ export default function DecisionBadge({ signal }: { signal: string }) {
 
       <div>
         <p className={`text-2xl md:text-3xl font-black tracking-wider ${c.text}`}>{c.label}</p>
-        <p className="text-[10px] md:text-xs text-[var(--text-muted)] font-medium tracking-widest opacity-80">TRADE SIGNAL</p>
+        <p className="text-[10px] md:text-xs text-[var(--text-muted)] font-medium tracking-widest opacity-80">交易訊號</p>
       </div>
     </div>
   );

@@ -14,6 +14,11 @@ class AnalystType(str, enum.Enum):
     fundamentals = "fundamentals"
 
 
+class LLMProvider(str, enum.Enum):
+    openai = "openai"
+    google = "google"
+
+
 class JobStatus(str, enum.Enum):
     pending = "pending"
     running = "running"
@@ -47,6 +52,7 @@ class AnalysisRequest(BaseModel):
     ]
     max_debate_rounds: int = 1
     max_risk_discuss_rounds: int = 1
+    llm_provider: LLMProvider = LLMProvider.openai
 
 
 # ── Nested result models ─────────────────────────────────────────────────────
@@ -90,6 +96,7 @@ class AnalysisJob(BaseModel):
     analysts: list[AnalystType]
     max_debate_rounds: int = 1
     max_risk_discuss_rounds: int = 1
+    llm_provider: LLMProvider = LLMProvider.openai
     created_at: datetime
     completed_at: Optional[datetime] = None
     result: Optional[AnalysisResult] = None
@@ -105,6 +112,7 @@ class JobSummary(BaseModel):
     ticker: str
     date: str
     analysts: list[AnalystType]
+    llm_provider: LLMProvider = LLMProvider.openai
     signal: Optional[str] = None
     created_at: datetime
     completed_at: Optional[datetime] = None

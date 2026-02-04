@@ -15,6 +15,7 @@ from app.models import (
     AnalysisResult,
     InvestDebateResult,
     RiskDebateResult,
+    LLMProvider,
     JobStatus,
     JobSummary,
     ProgressStep,
@@ -180,6 +181,7 @@ class AnalysisService:
             analysts=req.analysts,
             max_debate_rounds=req.max_debate_rounds,
             max_risk_discuss_rounds=req.max_risk_discuss_rounds,
+            llm_provider=req.llm_provider,
             created_at=datetime.utcnow(),
         )
         self._jobs[job.id] = job
@@ -196,6 +198,7 @@ class AnalysisService:
                 ticker=j.ticker,
                 date=j.date,
                 analysts=j.analysts,
+                llm_provider=j.llm_provider,
                 signal=j.result.signal if j.result else None,
                 created_at=j.created_at,
                 completed_at=j.completed_at,
@@ -237,11 +240,31 @@ class AnalysisService:
 
     # ── sync wrapper executed in thread pool ──────────────────────────────
 
+    # Provider-specific default models
+    _PROVIDER_DEFAULTS = {
+        LLMProvider.openai: {
+            "llm_provider": "openai",
+            "deep_think_llm": "o4-mini",
+            "quick_think_llm": "gpt-4o-mini",
+            "backend_url": "https://api.openai.com/v1",
+        },
+        LLMProvider.google: {
+            "llm_provider": "google",
+            "deep_think_llm": "gemini-2.0-flash",
+            "quick_think_llm": "gemini-2.0-flash",
+            "backend_url": "",  # Google SDK handles URL internally
+        },
+    }
+
     @staticmethod
     def _run_sync(job: AnalysisJob) -> AnalysisResult:
         config = DEFAULT_CONFIG.copy()
         config["max_debate_rounds"] = job.max_debate_rounds
         config["max_risk_discuss_rounds"] = job.max_risk_discuss_rounds
+
+        # Apply LLM provider settings
+        provider_defaults = AnalysisService._PROVIDER_DEFAULTS.get(job.llm_provider, {})
+        config.update(provider_defaults)
 
         graph = TradingAgentsGraph(
             selected_analysts=[a.value for a in job.analysts],

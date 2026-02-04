@@ -79,7 +79,7 @@ export default function HomePage() {
         {/* 2. 標題與價值主張 */}
         <header className="mb-6 flex justify-between items-end">
           <div>
-            <h1 className="text-2xl font-black text-black dark:text-white tracking-tight italic uppercase">TRADING AGENT</h1>
+            <h1 className="text-2xl font-black text-black dark:text-white tracking-tight">交易代理人</h1>
             <p className="text-gray-500 text-xs mt-1 font-bold">AI模組專家集群自動化決策</p>
           </div>
           <div className="text-right hidden sm:block">
@@ -88,7 +88,7 @@ export default function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
               </span>
-              AGENTS ONLINE
+              系統運行中
             </span>
           </div>
         </header>
@@ -219,7 +219,7 @@ export default function HomePage() {
               </div>
             ) : jobs?.length === 0 ? (
               <div className="bg-gray-50 dark:bg-white/5 p-10 rounded-2xl text-center border-2 border-dashed border-gray-200 dark:border-white/10">
-                <p className="text-gray-400 text-sm font-bold italic uppercase tracking-widest">Waiting for orders...</p>
+                <p className="text-gray-400 text-sm font-bold">尚無分析任務...</p>
               </div>
             ) : (
               jobs?.slice(0, 5).map((job) => (

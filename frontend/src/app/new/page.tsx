@@ -3,14 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { startAnalysis } from "@/lib/api";
-import { AnalystType } from "@/lib/types";
+import { AnalystType, LLMProvider } from "@/lib/types";
 
 // 擴充數據來源資訊，但不改動原本的 label 和 desc
-const analysts: { value: AnalystType; label: string; desc: string; icon: string; sources: string[] }[] = [
-  { value: "market", label: "市場分析", desc: "技術指標", icon: "📈", sources: ["Yahoo Finance", "Binance"] },
-  { value: "social", label: "社群情緒", desc: "輿情分析", icon: "💬", sources: ["X", "Reddit"] },
-  { value: "news", label: "新聞分析", desc: "即時新聞", icon: "🗞️", sources: ["Google News", "CryptoPanic"] },
-  { value: "fundamentals", label: "基本面", desc: "財務數據", icon: "📊", sources: ["SEC Filings", "CoinGecko"] },
+const analysts: { value: AnalystType; label: string; desc: string; sources: string[] }[] = [
+  { value: "market", label: "市場分析", desc: "技術指標", sources: ["Yahoo Finance", "Binance"] },
+  { value: "social", label: "社群情緒", desc: "輿情分析", sources: ["X", "Reddit"] },
+  { value: "news", label: "新聞分析", desc: "即時新聞", sources: ["Google News", "CryptoPanic"] },
+  { value: "fundamentals", label: "基本面", desc: "財務數據", sources: ["SEC Filings", "CoinGecko"] },
+];
+
+const providerOptions: { value: LLMProvider; label: string; desc: string }[] = [
+  { value: "openai", label: "OpenAI", desc: "GPT-4o / o4-mini" },
+  { value: "google", label: "Gemini", desc: "Gemini 2.0 Flash (Free)" },
 ];
 
 const depthOptions = [
@@ -27,14 +32,15 @@ export default function NewAnalysisPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selected, setSelected] = useState<AnalystType[]>(["market", "social", "news", "fundamentals"]);
   const [depth, setDepth] = useState(2);
-  const [isLiveMode, setIsLiveMode] = useState(true); 
+  const [provider, setProvider] = useState<LLMProvider>("google");
+  const [isLiveMode, setIsLiveMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 設置日期範圍限制：最遠追溯 30 天
   const maxDateStr = new Date().toISOString().slice(0, 10);
   const minDate = new Date();
-  minDate.setDate(minDate.getDate() - 30); 
+  minDate.setDate(minDate.getDate() - 30);
   const minDateStr = minDate.toISOString().slice(0, 10);
 
   const toggle = (a: AnalystType) => {
@@ -52,6 +58,7 @@ export default function NewAnalysisPage() {
         analysts: selected,
         max_debate_rounds: depth,
         max_risk_discuss_rounds: depth,
+        llm_provider: provider,
       });
       router.push(`/analysis/${id}`);
     } catch (e) {
@@ -72,10 +79,10 @@ export default function NewAnalysisPage() {
           <div className="flex items-center gap-3 mb-6">
             <div className="h-[1px] flex-1 bg-gray-200 dark:bg-white/10" />
           </div>
-          <h1 className="text-3xl md:text-7xl font-black text-black dark:text-white italic uppercase tracking-tighter leading-[0.85]">
+          <h1 className="text-3xl md:text-7xl font-black text-black dark:text-white tracking-tighter leading-[0.85]">
             開始你的分析
           </h1>
-          <p className="text-gray-400 font-bold text-sm mt-6 tracking-tight uppercase">
+          <p className="text-gray-400 font-bold text-sm mt-6 tracking-tight">
             部屬並設置你的分析工具
           </p>
         </header>
@@ -97,15 +104,15 @@ export default function NewAnalysisPage() {
                 />
                 {ticker && (
                   <div className="absolute right-0 bottom-4">
-                    <span className="text-[10px] font-black text-green-500 bg-green-500/10 px-2 py-1 rounded">LIVE_TRACKING</span>
+                    <span className="text-[10px] font-black text-green-500 bg-green-500/10 px-2 py-1 rounded">即時追蹤</span>
                   </div>
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-2 px-1">
               {hotTickers.map(t => (
-                <button 
+                <button
                   key={t}
                   type="button"
                   onClick={() => setTicker(t)}
@@ -124,27 +131,25 @@ export default function NewAnalysisPage() {
                 分析模式切換
               </label>
               <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-2xl border-2 border-gray-900 dark:border-white/20 transition-all">
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsLiveMode(true)}
-                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${
-                    isLiveMode 
-                    ? 'bg-orange-500 text-white shadow-inner' 
+                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${isLiveMode
+                    ? 'bg-orange-500 text-white shadow-inner'
                     : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
-                  }`}
+                    }`}
                 >
-                  LIVE 實時預測
+                  實時預測
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsLiveMode(false)}
-                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${
-                    !isLiveMode 
-                    ? 'bg-orange-500 text-white shadow-inner' 
+                  className={`flex-1 py-4 rounded-xl font-black text-sm transition-all duration-200 ${!isLiveMode
+                    ? 'bg-orange-500 text-white shadow-inner'
                     : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
-                  }`}
+                    }`}
                 >
-                  HISTORY 歷史回測
+                  歷史回測
                 </button>
               </div>
             </div>
@@ -179,7 +184,7 @@ export default function NewAnalysisPage() {
                     type="button"
                     onClick={() => toggle(a.value)}
                     className={`
-                      relative p-6 rounded-2xl text-left transition-all duration-300 border-2
+                      relative p-6 rounded-2xl text-left transition-all duration-300 border-2 flex flex-col justify-center
                       ${active
                         ? "bg-white dark:bg-gray-800 border-black dark:border-gray-600 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)] -translate-y-1 -translate-x-1"
                         : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-300 dark:text-gray-600 hover:border-gray-300 dark:hover:border-white/30 grayscale"
@@ -187,7 +192,7 @@ export default function NewAnalysisPage() {
                     `}
                   >
                     {active && <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />}
-                    <div className="text-3xl mb-5">{a.icon}</div>
+
                     <p className={`font-black text-base tracking-tighter ${active ? "text-black dark:text-white" : "text-gray-300 dark:text-gray-600"}`}>
                       {a.label}
                     </p>
@@ -207,7 +212,47 @@ export default function NewAnalysisPage() {
             </div>
           </div>
 
-          {/* 第四區塊：研究深度 */}
+          {/* 第四區塊：LLM 模型選擇 */}
+          <div className="w-full">
+            <label className="block text-[11px] font-black text-orange-500 uppercase tracking-widest mb-6 px-1">
+              AI 模型引擎
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {providerOptions.map((p) => {
+                const active = provider === p.value;
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setProvider(p.value)}
+                    className={`
+                      relative p-6 rounded-2xl text-left transition-all duration-300 border-2 flex flex-col justify-center
+                      ${active
+                        ? "bg-white dark:bg-gray-800 border-black dark:border-gray-600 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)] -translate-y-1 -translate-x-1"
+                        : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-300 dark:text-gray-600 hover:border-gray-300 dark:hover:border-white/30"
+                      }
+                    `}
+                  >
+                    {active && <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />}
+
+                    <p className={`font-black text-base tracking-tighter ${active ? "text-black dark:text-white" : "text-gray-300 dark:text-gray-600"}`}>
+                      {p.label}
+                    </p>
+                    <p className={`text-[10px] font-bold mt-1 ${active ? "text-orange-500" : "text-gray-200 dark:text-gray-700"}`}>
+                      {p.desc}
+                    </p>
+                    {p.value === "google" && (
+                      <span className={`inline-block mt-3 text-[9px] font-black px-2 py-0.5 rounded ${active ? "bg-green-500/10 text-green-500 border border-green-500/30" : "bg-gray-100 dark:bg-white/5 text-gray-300 dark:text-gray-600 border border-gray-100 dark:border-white/10"}`}>
+                        免費
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 第五區塊：研究深度 */}
           <div className="w-full">
             <label className="block text-[20px] font-black text-orange-500 uppercase tracking-widest mb-4 px-1">
               分析方式
@@ -240,8 +285,8 @@ export default function NewAnalysisPage() {
           </div>
 
           {error && (
-            <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border-2 border-red-500 text-red-500 text-xs font-black uppercase tracking-widest flex items-center gap-3">
-              <span className="bg-red-500 text-white px-1">Error</span>
+            <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border-2 border-red-500 text-red-500 text-xs font-black flex items-center gap-3">
+              <span className="bg-red-500 text-white px-2 py-0.5 rounded">錯誤</span>
               {error}
             </div>
           )}

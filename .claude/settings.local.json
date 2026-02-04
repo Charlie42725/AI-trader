@@ -10,7 +10,9 @@
       "Bash(tree:*)",
       "Bash(find /mnt/c/Users/linei/Desktop/coding/TradingAgents/tradingagents -type d -exec sh -c 'if [ ! -f \"\"$1/__init__.py\"\" ]; then echo \"\"Missing __init__.py: $1\"\"; fi' _ {} ;)",
       "Bash(find:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(python:*)",
+      "Bash(npx next build)"
     ]
   }
 }

@@ -261,7 +261,6 @@ input[type="text"],
 input[type="date"] {
   background: transparent;
   border: none;
-  color: black;
   transition: all 0.2s ease;
 }
 

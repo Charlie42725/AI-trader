@@ -1,5 +1,7 @@
 export type AnalystType = "market" | "social" | "news" | "fundamentals";
 
+export type LLMProvider = "openai" | "google";
+
 export type JobStatus = "pending" | "running" | "completed" | "failed";
 
 export type StepStatus = "pending" | "running" | "done";
@@ -17,6 +19,7 @@ export interface AnalysisRequest {
   analysts: AnalystType[];
   max_debate_rounds: number;
   max_risk_discuss_rounds: number;
+  llm_provider: LLMProvider;
 }
 
 export interface InvestDebateResult {
@@ -56,6 +59,7 @@ export interface AnalysisJob {
   analysts: AnalystType[];
   max_debate_rounds: number;
   max_risk_discuss_rounds: number;
+  llm_provider: LLMProvider;
   created_at: string;
   completed_at: string | null;
   result: AnalysisResult | null;
@@ -69,6 +73,7 @@ export interface JobSummary {
   ticker: string;
   date: string;
   analysts: AnalystType[];
+  llm_provider: LLMProvider;
   signal: string | null;
   created_at: string;
   completed_at: string | null;

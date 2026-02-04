@@ -35,9 +35,14 @@ export default function AnalysisCard({ job }: { job: JobSummary }) {
             </span>
             <StatusBadge status={job.status} />
           </div>
-          <p className="text-xs md:text-sm text-gray-400 font-bold mt-0.5 uppercase tracking-wider">
-            {job.date}
-          </p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-wider">
+              {job.date}
+            </p>
+            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10 text-gray-400 uppercase tracking-wider">
+              {job.llm_provider === "google" ? "Gemini" : "GPT"}
+            </span>
+          </div>
         </div>
 
         {/* 訊號 / 箭頭 - 橘色強化 */}
