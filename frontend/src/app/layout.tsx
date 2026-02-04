@@ -8,6 +8,16 @@ import Onboarding from "@/components/Onboarding";
 export const metadata: Metadata = {
   title: "TradingAgents",
   description: "AI 智能交易分析",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192x192.png",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "TradingAgents",
+  },
 };
 
 export const viewport: Viewport = {
