@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // 1. 引入 Router
 import {
   ShieldCheck, MessageSquare, Globe,
   BarChart3, CheckCircle2, X, RotateCcw, Settings2,
-  Users, Layers, Zap, Loader2, Sparkles, Heart, Eye
+  Users, Layers, Zap, Loader2, Sparkles, Heart, Eye,
+  ArrowUpRight // 引入新圖標
 } from "lucide-react";
-import { STRATEGY_DATABASE, DEFAULT_CONFIGS, Category, Option } from "@/data/strategy-data";
+import { STRATEGY_DATABASE, DEFAULT_CONFIGS } from "@/data/strategy-data";
+import { Category, Option } from "@/lib/types";
 
 export default function MarketPage() {
+  const router = useRouter(); // 2. 初始化 Router
   const [activeTab, setActiveTab] = useState<"config" | "community">("config");
   const [isModalOpen, setIsModalOpen] = useState<string | null>(null);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -37,11 +41,18 @@ export default function MarketPage() {
   ];
 
   const handleOpenModal = (id: string) => {
-    if (!STRATEGY_DATABASE[id]) return;
+    const data = STRATEGY_DATABASE[id];
+    if (!data) return;
     setIsModalOpen(id);
-    setActiveSubTab(STRATEGY_DATABASE[id].categories[0].id);
+    setActiveSubTab(data.categories[0].id);
     setTempSelections(selections[id] || []);
     setTempPrompt(prompts[id] || "");
+  };
+
+  // 3. 新增進入 Library 的函數
+  const handleGoToLibrary = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // 防止觸發父層的 Modal 開啟
+    router.push(`/market/library/${id}`);
   };
 
   const handleSave = () => {
@@ -65,49 +76,108 @@ export default function MarketPage() {
       <header className="px-4 md:px-6 pt-6 md:pt-12 pb-4 md:pb-6 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-black">
         <div className="flex justify-between items-center mb-4 md:mb-6">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-tighter">策略中心</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-tighter text-slate-900 dark:text-white">策略中心</h1>
             <p className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 font-bold tracking-widest mt-0.5 md:mt-1">V1.0 引擎</p>
           </div>
-          <div className="bg-slate-100 dark:bg-white/10 p-0.5 md:p-1 rounded-xl md:rounded-2xl flex gap-0.5 md:gap-1 border border-slate-200 dark:border-white/5">
-            <button
-              onClick={() => setActiveTab("config")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black transition-all ${activeTab === "config" ? "bg-white dark:bg-orange-500 shadow-md text-black dark:text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-400"}`}
-            >
-              <Layers size={12} /> 我的配置
-            </button>
-            <button
-              onClick={() => setActiveTab("community")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black transition-all ${activeTab === "community" ? "bg-white dark:bg-orange-500 shadow-md text-black dark:text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-400"}`}
-            >
-              <Users size={12} /> 社群
-            </button>
-          </div>
-        </div>
-      </header>
+          {/* 三段式導航控制列 - 全動態伸縮版 */}
+<div className="bg-slate-100 dark:bg-white/5 p-1 rounded-2xl flex border border-slate-200 dark:border-white/10 w-fit mx-auto relative h-[48px] gap-1 items-center">
+  
+  {/* 1. 我的配置 - Tab 選項 */}
+  <button
+    onClick={() => setActiveTab("config")}
+    className={`flex items-center justify-center gap-2 rounded-xl h-full px-3 transition-all duration-300 ease-in-out ${
+      activeTab === "config" 
+      ? "bg-white dark:bg-zinc-800 shadow-sm text-black dark:text-orange-400" 
+      : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+    }`}
+  >
+    <Layers size={18} className="flex-shrink-0" /> 
+    <span className={`text-[11px] font-black whitespace-nowrap overflow-hidden transition-all duration-300 ${
+      activeTab === "config" ? "max-w-[80px] opacity-100 ml-1" : "max-w-0 opacity-0"
+    }`}>
+      我的配置
+    </span>
+  </button>
+
+  {/* 2. 資料庫 - 跳轉入口 (移除底色、透明伸縮版) */}
+<button
+  onClick={() => router.push('/market/library/market')}
+  className={`flex items-center justify-center gap-2 rounded-xl h-full px-3 transition-all duration-300 ease-in-out ${
+    activeTab !== "config" && activeTab !== "community"
+      ? "bg-white dark:bg-zinc-800 shadow-sm text-orange-500" // 被選中/激活時的樣式
+      : "text-slate-500 hover:text-orange-500 dark:text-slate-400" // 平時樣式
+  }`}
+>
+  <Zap 
+    size={18} 
+    className={`flex-shrink-0 transition-transform ${
+      activeTab !== "config" && activeTab !== "community" ? "fill-orange-500" : ""
+    }`} 
+  />
+  <span className={`text-[11px] font-black italic uppercase tracking-tighter whitespace-nowrap overflow-hidden transition-all duration-300 ${
+    activeTab !== "config" && activeTab !== "community" 
+      ? "max-w-[80px] opacity-100 ml-1" 
+      : "max-w-0 opacity-0"
+  }`}>
+    資料庫
+  </span>
+</button>
+
+  {/* 3. 社群 - Tab 選項 */}
+  <button
+    onClick={() => setActiveTab("community")}
+    className={`flex items-center justify-center gap-2 rounded-xl h-full px-3 transition-all duration-300 ease-in-out ${
+      activeTab === "community" 
+      ? "bg-white dark:bg-zinc-800 shadow-sm text-black dark:text-orange-400" 
+      : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+    }`}
+  >
+    <Users size={18} className="flex-shrink-0" /> 
+    <span className={`text-[11px] font-black whitespace-nowrap overflow-hidden transition-all duration-300 ${
+      activeTab === "community" ? "max-w-[80px] opacity-100 ml-1" : "max-w-0 opacity-0"
+    }`}>
+      社群
+    </span>
+  </button>
+
+</div>
+  </div>
+</header>
 
       <div className="p-4 md:p-6 max-w-2xl mx-auto">
         {activeTab === "config" ? (
           <div className="space-y-3 md:space-y-4 animate-in fade-in slide-in-from-left-4 duration-500">
             <section className="grid gap-3 md:gap-4">
               {modules.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => handleOpenModal(m.id)}
-                  className="flex items-center justify-between p-4 md:p-6 bg-slate-200/50 dark:bg-zinc-900/50 rounded-2xl md:rounded-[32px] border-4 border-transparent hover:border-black dark:hover:border-orange-500 transition-all text-left group active:scale-95 shadow-sm"
-                >
-                  <div className="flex items-center gap-3 md:gap-5">
-                    <div className={`${m.color} bg-white dark:bg-white/10 p-3 md:p-4 rounded-xl md:rounded-2xl group-hover:scale-110 group-hover:rotate-6 transition-transform shadow-sm`}>
-                      {m.icon}
+                <div key={m.id} className="relative group">
+                  <button
+                    onClick={() => handleOpenModal(m.id)}
+                    className="w-full flex items-center justify-between p-4 md:p-6 bg-slate-200/50 dark:bg-zinc-900/50 rounded-2xl md:rounded-[32px] border-4 border-transparent hover:border-black dark:hover:border-orange-500 transition-all text-left active:scale-[0.98] shadow-sm"
+                  >
+                    <div className="flex items-center gap-3 md:gap-5">
+                      <div className={`${m.color} bg-white dark:bg-white/10 p-3 md:p-4 rounded-xl md:rounded-2xl group-hover:scale-110 transition-transform shadow-sm`}>
+                        {m.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-black text-base md:text-lg leading-none text-slate-900 dark:text-white">{m.label}</h3>
+                        <p className="text-[9px] md:text-[10px] text-slate-600 dark:text-slate-400 font-bold mt-1 md:mt-2">
+                          {selections[m.id]?.length || 0} 個組件已啟用
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-black text-base md:text-lg leading-none text-slate-900 dark:text-white">{m.label}</h3>
-                      <p className="text-[9px] md:text-[10px] text-slate-600 dark:text-slate-400 font-bold mt-1 md:mt-2">
-                        {selections[m.id]?.length || 0} 個組件已啟用
-                      </p>
+                    
+                    {/* 4. 新增的進入詳細庫存按鈕 */}
+                    <div className="flex items-center gap-2">
+                        <div 
+                          onClick={(e) => handleGoToLibrary(e, m.id)}
+                          className="p-2 md:p-3 bg-white dark:bg-zinc-800 rounded-full border border-slate-200 dark:border-white/10 hover:bg-orange-500 hover:text-white transition-all shadow-sm group/btn"
+                        >
+                            <ArrowUpRight size={16} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                        </div>
+                        <Settings2 className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
                     </div>
-                  </div>
-                  <Settings2 className="w-4 h-4 md:w-5 md:h-5 text-slate-400 group-hover:text-black dark:group-hover:text-orange-500 transition-colors" />
-                </button>
+                  </button>
+                </div>
               ))}
             </section>
           </div>
@@ -167,7 +237,16 @@ export default function MarketPage() {
                 <h2 className="text-xl md:text-3xl font-black italic text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                   {modules.find(m => m.id === isModalOpen)?.label}
                 </h2>
-                <p className="text-[9px] md:text-[10px] text-orange-600 dark:text-orange-500 font-black mt-2 md:mt-3 tracking-widest">個人化代理設定</p>
+                <div className="flex items-center gap-3 mt-2 md:mt-3">
+                    <p className="text-[9px] md:text-[10px] text-orange-600 dark:text-orange-500 font-black tracking-widest">個人化代理設定</p>
+                    {/* Modal 內也放一個進入 Library 的連結 */}
+                    <button 
+                      onClick={(e) => handleGoToLibrary(e, isModalOpen)}
+                      className="text-[9px] text-slate-400 hover:text-orange-500 underline font-bold"
+                    >
+                      開啟高級庫存詳細設定
+                    </button>
+                </div>
               </div>
               <button onClick={() => setIsModalOpen(null)} className="p-2 md:p-3 bg-slate-100 dark:bg-white/10 rounded-xl md:rounded-2xl hover:bg-red-100 dark:hover:bg-red-900/40 group transition-colors">
                 <X className="w-5 h-5 md:w-6 md:h-6 group-hover:text-red-600 text-slate-600 dark:text-white" />
@@ -246,7 +325,7 @@ export default function MarketPage() {
       {isSuccessOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsSuccessOpen(false)} />
-          <div className="relative bg-white dark:bg-[#1A1A1A] p-8 md:p-10 rounded-3xl md:rounded-[48px] shadow-[0_32px_80px_rgba(0,0,0,0.5)] flex flex-col items-center text-center max-w-[280px] md:max-w-[320px] w-full animate-in zoom-in-75 cubic-bezier(0.34, 1.56, 0.64, 1) duration-500 border border-white/10">
+          <div className="relative bg-white dark:bg-[#1A1A1A] p-8 md:p-10 rounded-3xl md:rounded-[48px] shadow-[0_32px_80px_rgba(0,0,0,0.5)] flex flex-col items-center text-center max-w-[280px] md:max-w-[320px] w-full animate-in zoom-in-75 duration-500 border border-white/10">
             <div className="relative mb-5 md:mb-6">
               <div className="w-20 h-20 md:w-24 md:h-24 bg-green-500 rounded-full flex items-center justify-center animate-bounce shadow-[0_10px_40px_rgba(34,197,94,0.5)]">
                 <CheckCircle2 size={40} className="text-white md:hidden" />
