@@ -21,6 +21,7 @@ from app.models import (
     ProgressStep,
     StepStatus,
 )
+from app.services.supabase_client import get_supabase
 
 
 # ── Progress step definitions ────────────────────────────────────────────────
@@ -164,57 +165,139 @@ def _detect_and_apply(job: AnalysisJob, prev: dict, curr: dict,
         completed_keys.add("final_decision")
 
 
-class AnalysisService:
-    """In-memory job store and TradingAgentsGraph runner."""
+# ── Supabase helpers ─────────────────────────────────────────────────────────
 
+def _row_to_job(row: dict) -> AnalysisJob:
+    """Convert a Supabase row dict into an AnalysisJob model."""
+    from app.models import AnalystType
+
+    analysts_raw = row.get("analysts") or []
+    analysts = [AnalystType(a) for a in analysts_raw]
+
+    result = None
+    if row.get("result"):
+        result = AnalysisResult(**row["result"])
+
+    progress = None
+    if row.get("progress"):
+        progress = [ProgressStep(**p) for p in row["progress"]]
+
+    return AnalysisJob(
+        id=row["id"],
+        status=JobStatus(row["status"]),
+        ticker=row["ticker"],
+        date=row["date"],
+        analysts=analysts,
+        max_debate_rounds=row.get("max_debate_rounds", 1),
+        max_risk_discuss_rounds=row.get("max_risk_discuss_rounds", 1),
+        llm_provider=LLMProvider(row.get("llm_provider", "openai")),
+        created_at=row["created_at"],
+        completed_at=row.get("completed_at"),
+        result=result,
+        error=row.get("error"),
+        progress=progress,
+    )
+
+
+def _row_to_summary(row: dict) -> JobSummary:
+    """Convert a Supabase row dict into a JobSummary (lightweight, no result)."""
+    from app.models import AnalystType
+
+    analysts_raw = row.get("analysts") or []
+    analysts = [AnalystType(a) for a in analysts_raw]
+
+    return JobSummary(
+        id=row["id"],
+        status=JobStatus(row["status"]),
+        ticker=row["ticker"],
+        date=row["date"],
+        analysts=analysts,
+        llm_provider=LLMProvider(row.get("llm_provider", "openai")),
+        signal=row.get("signal"),
+        created_at=row["created_at"],
+        completed_at=row.get("completed_at"),
+        error=row.get("error"),
+    )
+
+
+class AnalysisService:
+    """Supabase-backed job store and TradingAgentsGraph runner."""
+
+    # In-memory cache for running jobs only (progress updates during analysis)
     def __init__(self) -> None:
-        self._jobs: Dict[str, AnalysisJob] = {}
+        self._running_jobs: Dict[str, AnalysisJob] = {}
 
     # ── public API ────────────────────────────────────────────────────────
 
-    def create_job(self, req: AnalysisRequest) -> AnalysisJob:
-        job = AnalysisJob(
-            id=uuid.uuid4().hex[:12],
-            status=JobStatus.pending,
-            ticker=req.ticker.upper(),
-            date=req.date,
-            analysts=req.analysts,
-            max_debate_rounds=req.max_debate_rounds,
-            max_risk_discuss_rounds=req.max_risk_discuss_rounds,
-            llm_provider=req.llm_provider,
-            created_at=datetime.utcnow(),
+    def create_job(self, req: AnalysisRequest, user_id: str) -> AnalysisJob:
+        job_id = uuid.uuid4().hex[:12]
+        now = datetime.utcnow().isoformat()
+
+        row = {
+            "id": job_id,
+            "user_id": user_id,
+            "status": "pending",
+            "ticker": req.ticker.upper(),
+            "date": req.date,
+            "analysts": [a.value for a in req.analysts],
+            "max_debate_rounds": req.max_debate_rounds,
+            "max_risk_discuss_rounds": req.max_risk_discuss_rounds,
+            "llm_provider": req.llm_provider.value,
+            "created_at": now,
+        }
+
+        sb = get_supabase()
+        resp = sb.table("analysis_jobs").insert(row).execute()
+        inserted = resp.data[0]
+
+        # Deduct 1 credit
+        sb.table("credit_transactions").insert({
+            "user_id": user_id,
+            "amount": -1,
+            "reason": "analysis",
+            "job_id": job_id,
+        }).execute()
+        profile = sb.table("profiles").select("credits").eq("id", user_id).single().execute()
+        new_credits = profile.data["credits"] - 1
+        sb.table("profiles").update({"credits": new_credits}).eq("id", user_id).execute()
+
+        return _row_to_job(inserted)
+
+    def get_job(self, job_id: str, user_id: str | None = None) -> AnalysisJob | None:
+        # If job is currently running, return in-memory version (has live progress)
+        if job_id in self._running_jobs:
+            return self._running_jobs[job_id]
+
+        sb = get_supabase()
+        query = sb.table("analysis_jobs").select("*").eq("id", job_id)
+        if user_id:
+            query = query.eq("user_id", user_id)
+        resp = query.execute()
+
+        if not resp.data:
+            return None
+        return _row_to_job(resp.data[0])
+
+    def list_jobs(self, user_id: str) -> list[JobSummary]:
+        sb = get_supabase()
+        resp = (
+            sb.table("analysis_jobs")
+            .select("id, status, ticker, date, analysts, llm_provider, signal, created_at, completed_at, error")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .execute()
         )
-        self._jobs[job.id] = job
-        return job
-
-    def get_job(self, job_id: str) -> AnalysisJob | None:
-        return self._jobs.get(job_id)
-
-    def list_jobs(self) -> list[JobSummary]:
-        return [
-            JobSummary(
-                id=j.id,
-                status=j.status,
-                ticker=j.ticker,
-                date=j.date,
-                analysts=j.analysts,
-                llm_provider=j.llm_provider,
-                signal=j.result.signal if j.result else None,
-                created_at=j.created_at,
-                completed_at=j.completed_at,
-                error=j.error,
-            )
-            for j in sorted(
-                self._jobs.values(), key=lambda j: j.created_at, reverse=True
-            )
-        ]
+        return [_row_to_summary(row) for row in resp.data]
 
     # ── background runner (called from BackgroundTasks) ───────────────────
 
     async def run_analysis(self, job_id: str) -> None:
-        job = self._jobs.get(job_id)
-        if job is None:
+        sb = get_supabase()
+        resp = sb.table("analysis_jobs").select("*").eq("id", job_id).execute()
+        if not resp.data:
             return
+
+        job = _row_to_job(resp.data[0])
 
         # Initialize progress steps
         job.progress = _build_progress(job.analysts)
@@ -222,6 +305,15 @@ class AnalysisService:
             _update_step(job, job.progress[0].key, StepStatus.running)
 
         job.status = JobStatus.running
+
+        # Keep in memory for live progress polling
+        self._running_jobs[job_id] = job
+
+        # Persist running status + initial progress
+        sb.table("analysis_jobs").update({
+            "status": "running",
+            "progress": [s.model_dump() for s in job.progress] if job.progress else None,
+        }).eq("id", job_id).execute()
 
         try:
             result = await asyncio.to_thread(self._run_sync, job)
@@ -232,11 +324,45 @@ class AnalysisService:
                 for s in job.progress:
                     if s.status != StepStatus.done:
                         _update_step(job, s.key, StepStatus.done)
+
+            # Persist final result
+            now = datetime.utcnow().isoformat()
+            sb.table("analysis_jobs").update({
+                "status": "completed",
+                "signal": result.signal,
+                "result": result.model_dump(),
+                "progress": [s.model_dump() for s in job.progress] if job.progress else None,
+                "completed_at": now,
+            }).eq("id", job_id).execute()
+
         except Exception:
-            job.error = traceback.format_exc()
+            error_msg = traceback.format_exc()
+            job.error = error_msg
             job.status = JobStatus.failed
+
+            now = datetime.utcnow().isoformat()
+            sb.table("analysis_jobs").update({
+                "status": "failed",
+                "error": error_msg,
+                "progress": [s.model_dump() for s in job.progress] if job.progress else None,
+                "completed_at": now,
+            }).eq("id", job_id).execute()
+
+            # Refund credit on failure
+            user_id = resp.data[0]["user_id"]
+            sb.table("credit_transactions").insert({
+                "user_id": user_id,
+                "amount": 1,
+                "reason": "refund",
+                "job_id": job_id,
+            }).execute()
+            profile = sb.table("profiles").select("credits").eq("id", user_id).single().execute()
+            new_credits = profile.data["credits"] + 1
+            sb.table("profiles").update({"credits": new_credits}).eq("id", user_id).execute()
+
         finally:
-            job.completed_at = datetime.utcnow()
+            # Remove from in-memory cache
+            self._running_jobs.pop(job_id, None)
 
     # ── sync wrapper executed in thread pool ──────────────────────────────
 

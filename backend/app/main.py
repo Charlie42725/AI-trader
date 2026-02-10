@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.analysis import router as analysis_router
+from app.routes.profile import router as profile_router
 
 app = FastAPI(title="TradingAgents API", version="0.1.0")
 
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(analysis_router)
+app.include_router(profile_router)
 
 
 @app.get("/api/health")

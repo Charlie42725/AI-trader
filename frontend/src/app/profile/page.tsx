@@ -9,7 +9,9 @@ import {
     LanguageIcon,
     ShieldCheckIcon,
     MoonIcon,
-    SunIcon
+    SunIcon,
+    CheckIcon,
+    SparklesIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -100,6 +102,110 @@ export default function ProfilePage() {
                         <div className="flex items-end gap-1">
                             <span className="text-2xl font-black text-orange-600">{user.stats.creditsRemaining}</span>
                             <span className="text-xs text-gray-400 font-bold mb-1.5">點</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3.5 Subscription Plans */}
+                <div className="mb-8">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 pl-2">訂閱方案</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                        {/* Free Plan */}
+                        <div className="bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 p-4 flex flex-col">
+                            <p className="text-sm font-black text-black dark:text-white">Free</p>
+                            <div className="mt-2 mb-3">
+                                <span className="text-2xl font-black text-black dark:text-white">免費</span>
+                            </div>
+                            <div className="border-t border-gray-100 dark:border-white/10 pt-3 mb-4 flex-1">
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">Gemini 模型</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">基本額度</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">基本分析</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button className="w-full py-2 rounded-lg text-xs font-bold border border-gray-200 dark:border-white/10 text-gray-400 bg-white dark:bg-white/5 hover:border-gray-300 transition-colors">
+                                選擇方案
+                            </button>
+                        </div>
+
+                        {/* PRO Plan */}
+                        <div className="bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 p-4 flex flex-col relative">
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500 text-white text-[9px] font-black tracking-wide">
+                                目前方案
+                            </div>
+                            <p className="text-sm font-black text-black dark:text-white">PRO</p>
+                            <div className="mt-2 mb-3">
+                                <span className="text-2xl font-black text-black dark:text-white">$99</span>
+                                <span className="text-[10px] text-gray-400 font-bold">/月</span>
+                            </div>
+                            <div className="border-t border-gray-100 dark:border-white/10 pt-3 mb-4 flex-1">
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">GPT 模型</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">有限額度</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">進階分析</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">優先處理</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button disabled className="w-full py-2 rounded-lg text-xs font-bold border border-orange-200 dark:border-orange-500/30 text-orange-400 bg-orange-50 dark:bg-orange-500/10 cursor-not-allowed opacity-60">
+                                目前方案
+                            </button>
+                        </div>
+
+                        {/* PRO MAX Plan */}
+                        <div className="bg-gray-50 dark:bg-white/5 rounded-xl border-2 border-orange-500 p-4 flex flex-col relative shadow-sm shadow-orange-100 dark:shadow-none">
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500 text-white text-[9px] font-black tracking-wide">
+                                <SparklesIcon className="w-2.5 h-2.5" />
+                                推薦
+                            </div>
+                            <p className="text-sm font-black text-orange-600 dark:text-orange-400">PRO MAX</p>
+                            <div className="mt-2 mb-3">
+                                <span className="text-2xl font-black text-black dark:text-white">$199</span>
+                                <span className="text-[10px] text-gray-400 font-bold">/月</span>
+                            </div>
+                            <div className="border-t border-orange-200 dark:border-orange-500/20 pt-3 mb-4 flex-1">
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">GPT 模型</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">大量額度</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">無限制分析</span>
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                        <CheckIcon className="w-3.5 h-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-[11px] text-gray-500 dark:text-gray-400">最高優先處理</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button className="w-full py-2 rounded-lg text-xs font-black bg-orange-500 hover:bg-orange-600 text-white transition-colors active:scale-[0.97]">
+                                升級方案
+                            </button>
                         </div>
                     </div>
                 </div>
