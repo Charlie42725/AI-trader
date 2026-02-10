@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   X, ArrowRight, Target, Compass, Sparkles, 
-  BarChart3, Rocket, ChevronLeft, CheckCircle2,
-  Zap, TrendingUp, Anchor, Cpu, Coins, Shield,
-  Factory, Beaker, Crown, Rabbit, Gem
+  ChevronLeft, Zap, TrendingUp, Anchor, 
+  Shield, Crown, Rabbit, Gem, BrainCircuit, Loader2,
+  Clock, Wallet, LineChart, Search, Coins, AlertTriangle,
+  HeartPulse, Briefcase, Landmark, Percent
 } from "lucide-react";
 
 type FlowState = "ENTRY" | "DISCOVERY";
@@ -15,223 +16,192 @@ export default function MarketPage() {
   const router = useRouter();
   const [flowState, setFlowState] = useState<FlowState>("ENTRY");
   const [discoveryStep, setDiscoveryStep] = useState(1);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
 
-  // --- ENTRY 階段 (保持不變) ---
+  const quizSteps = [
+    { id: 1, q: "投資的初心是？", key: "goal", opts: [
+      { id: "A", t: "🏦 緊急預備金/存錢", d: "比銀行利息高一點就好", icon: <Anchor className="text-blue-600"/> },
+      { id: "B", t: "🚀 長期積累財富", d: "為了買車買房或創業基金", icon: <Briefcase className="text-orange-600"/> },
+      { id: "C", t: "🌅 退休規劃", d: "追求數十年的長期穩定成長", icon: <Crown className="text-amber-600"/> },
+      { id: "D", t: "💰 賺取被動收入", d: "每個月或每季領取現金花用", icon: <Coins className="text-emerald-600"/> }
+    ]},
+    { id: 2, q: "若帳戶突然縮水 10%？", key: "risk", opts: [
+      { id: "A", t: "😱 非常焦慮", d: "想趕快把錢領出來", icon: <AlertTriangle className="text-red-600"/> },
+      { id: "B", t: "🧐 有點擔心", d: "能忍受，只要長期漲回來", icon: <Search className="text-blue-500"/> },
+      { id: "C", t: "⚖️ 理性看待", d: "考慮趁低價多買一點", icon: <Shield className="text-zinc-600"/> },
+      { id: "D", t: "🧊 毫無感覺", d: "放著不動等它翻倍", icon: <Zap className="text-orange-500"/> }
+    ]},
+    { id: 3, q: "預計採取的投入方式？", key: "method", opts: [
+      { id: "A", t: "📅 定期定額", d: "每月固定撥出小額資金", icon: <Clock className="text-orange-500"/> },
+      { id: "B", t: "💵 單筆投入", d: "手邊大筆存款一次性投入", icon: <Wallet className="text-zinc-700"/> },
+      { id: "C", t: "🔄 混合式", d: "先投大筆，後續每月持續加碼", icon: <TrendingUp className="text-orange-600"/> }
+    ]},
+    { id: 4, q: "資金多久「絕對不」動用？", key: "horizon", opts: [
+      { id: "A", t: "🕐 極短期 (1年內)", d: "需要極高流動性的資產", icon: <Zap className="text-orange-500"/> },
+      { id: "B", t: "⏳ 中期 (1-3年)", d: "可忍受波動換取更高報酬", icon: <LineChart className="text-blue-600"/> },
+      { id: "C", t: "💎 長期 (3年以上)", d: "讓時間發揮複利效果", icon: <Gem className="text-emerald-600"/> }
+    ]},
+    { id: 5, q: "你更看重標的的什麼？", key: "feature", opts: [
+      { id: "A", t: "📝 簡單透明", d: "不需要研究，保本為主", icon: <Shield className="text-zinc-500"/> },
+      { id: "B", t: "🌍 跟隨大盤", d: "買入 ETF 跟著經濟成長", icon: <Landmark className="text-blue-700"/> },
+      { id: "C", t: "🧧 領息回扣", d: "定期看到錢撥入帳戶的感覺", icon: <Percent className="text-orange-600"/> }
+    ]},
+    { id: 6, q: "願意花多少時間管理？", key: "management", opts: [
+      { id: "A", t: "🛌 完全不想管", d: "買了就放著，一年看一次", icon: <HeartPulse className="text-red-400"/> },
+      { id: "B", t: "☕ 偶爾關心", d: "每月看財經新聞或損益", icon: <Search className="text-zinc-500"/> },
+      { id: "C", t: "🧠 很有興趣", d: "願意學習分析尋找買點", icon: <BrainCircuit className="text-orange-500"/> }
+    ]},
+    { id: 7, q: "偏好的存放方式？", key: "storage", opts: [
+      { id: "A", t: "🏦 高利活存", d: "靈活性最高，隨存隨領", icon: <Landmark className="text-blue-600"/> },
+      { id: "B", t: "🔒 短期定存", d: "安全保本，強迫鎖住資金", icon: <Shield className="text-zinc-700"/> },
+      { id: "C", t: "📈 貨幣基金", d: "風險極低，適合資金待命", icon: <Coins className="text-emerald-600"/> }
+    ]},
+    { id: 8, q: "目前常用的金融帳戶？", key: "account", opts: [
+      { id: "A", t: "📈 已經有證券戶", d: "直接在 App 操作即可", icon: <LineChart className="text-orange-500"/> },
+      { id: "B", t: "🏦 只有銀行帳戶", d: "習慣用銀行 App", icon: <Landmark className="text-zinc-600"/> },
+      { id: "C", t: "🆕 都沒有/願意開戶", d: "追求 0 手續費平台", icon: <Zap className="text-orange-400"/> }
+    ]},
+    { id: 9, q: "關於「領錢」的預期？", key: "payout", opts: [
+      { id: "A", t: "🔄 累積型", d: "利息滾入，一年後一次領回", icon: <TrendingUp className="text-blue-600"/> },
+      { id: "B", t: "💵 配息型", d: "每季或每月領到利息", icon: <Percent className="text-orange-600"/> }
+    ]}
+  ];
+
+  useEffect(() => {
+    if (discoveryStep > quizSteps.length) {
+      setIsAnalyzing(true);
+      const timer = setTimeout(() => setIsAnalyzing(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [discoveryStep, quizSteps.length]);
+
+  const handleSelect = (val: string) => {
+    setAnswers(prev => ({ ...prev, [discoveryStep]: val }));
+    setDiscoveryStep(prev => prev + 1);
+  };
+
+  const getRecommendations = () => {
+    const isConservative = answers[2] === "A" || answers[4] === "A";
+    const wantsIncome = answers[1] === "D" || answers[9] === "B";
+
+    if (isConservative) {
+      return [
+        { t: "00719B", label: "低波動美債", reason: "適合 1 年內動用且極度避險的資金", color: "border-l-orange-500" },
+        { t: "MMF", label: "貨幣基金", reason: "優於定存的靈活性，適合儲蓄替代", color: "border-l-zinc-300" }
+      ];
+    }
+    if (wantsIncome) {
+      return [
+        { t: "00919", label: "高股息強者", reason: "符合配息需求，穩定發放現金流", color: "border-l-orange-500" },
+        { t: "JEPI", label: "主動型抵補", reason: "美股高息選擇，波動相對大盤小", color: "border-l-zinc-800" }
+      ];
+    }
+    return [
+      { t: "NVDA", label: "AI 領航員", reason: "高成長潛力，適合長期累積財富", color: "border-l-orange-600" },
+      { t: "VOO", label: "標普 500", reason: "最穩健的長期配置建議", color: "border-l-zinc-900" }
+    ];
+  };
+
   if (flowState === "ENTRY") {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0A0A0A] flex flex-col animate-in fade-in duration-500">
-        <div className="pt-20 pb-12 px-8 text-center">
-          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-black dark:text-white mb-4 whitespace-nowrap">
-            已經做好投資準備了嗎？
-          </h1>
-          <div className="h-1.5 w-24 bg-orange-500 mx-auto rounded-full mb-4 shadow-[0_4px_10px_rgba(249,115,22,0.3)]" />
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] whitespace-nowrap">
-            選擇並繼續
-          </p>
+      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-700">
+        <div className="mb-10 w-24 h-24 bg-orange-500 rounded-[32px] flex items-center justify-center shadow-xl shadow-orange-200">
+          <BrainCircuit size={48} className="text-white" />
         </div>
-
-        <div className="flex-1 px-6 max-w-2xl mx-auto w-full flex flex-col gap-6 justify-start">
-          <button 
-            onClick={() => router.push("/new")}
-            className="group relative overflow-hidden flex flex-col items-start p-8 bg-white dark:bg-zinc-900 rounded-[40px] border-[3px] border-slate-100 dark:border-white/5 hover:border-black dark:hover:border-orange-500 transition-all shadow-sm active:scale-[0.98]"
-          >
-            <div className="bg-black dark:bg-orange-600 p-4 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
-              <Target size={32} className="text-white" />
-            </div>
-            <h2 className="text-2xl font-black text-black dark:text-white mb-2 italic whitespace-nowrap">確定，我已有目標標的</h2>
-            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">直接輸入代碼，進行 AI 診斷</p>
-            <div className="absolute top-8 right-8 text-slate-200 dark:text-zinc-800 group-hover:text-orange-500 transition-colors">
-              <ArrowRight size={40} />
-            </div>
+        <h1 className="text-4xl font-black italic tracking-tighter mb-4 text-zinc-900 dark:text-white">做好投資準備了嗎？</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm mb-16 max-w-[280px] leading-relaxed">
+          透過 9 個核心問題，為您匹配最佳建議。
+        </p>
+        <div className="grid gap-5 w-full max-w-sm">
+          <button onClick={() => setFlowState("DISCOVERY")} className="p-7 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-[28px] font-black italic text-xl flex items-center justify-center gap-3 shadow-2xl hover:bg-orange-600 hover:text-white dark:hover:bg-orange-500 transition-all active:scale-95">
+            開始旅程 <ArrowRight />
           </button>
-
-          <button 
-            onClick={() => setFlowState("DISCOVERY")}
-            className="group relative overflow-hidden flex flex-col items-start p-8 bg-white dark:bg-zinc-900 rounded-[40px] border-[3px] border-slate-100 dark:border-white/5 hover:border-orange-500 transition-all shadow-sm active:scale-[0.98]"
-          >
-            <div className="bg-orange-500 p-4 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
-              <Compass size={32} className="text-white" />
-            </div>
-            <h2 className="text-2xl font-black text-black dark:text-white mb-2 italic whitespace-nowrap">不，我還沒找到目標</h2>
-            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">讓 AI 幫我找找有什麼好機會</p>
-            <div className="absolute top-8 right-8 text-slate-200 dark:text-zinc-800 group-hover:text-orange-500 transition-colors">
-              <ArrowRight size={40} />
-            </div>
+          <button onClick={() => router.push("/new")} className="py-4 text-zinc-400 font-black text-xs uppercase tracking-[0.2em] hover:text-orange-600 transition-colors">
+            已經有明確目標，直接去分析
           </button>
-        </div>
-
-        <div className="py-12 text-center">
-            <button onClick={() => router.back()} className="text-[10px] font-black text-slate-400 hover:text-black dark:hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto uppercase tracking-widest whitespace-nowrap">
-               <ChevronLeft size={14} /> Back to dashboard
-            </button>
         </div>
       </div>
     );
   }
 
-  // --- DISCOVERY 階段 (聊天白話版) ---
+  const currentQuiz = quizSteps.find(s => s.id === discoveryStep);
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-black dark:text-white p-8 flex flex-col animate-in slide-in-from-right duration-700 ease-out">
+    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] p-6 flex flex-col">
       <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
-        
         {/* Progress Bar */}
-        <div className="flex justify-between items-center mb-12 pt-10">
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${
-                discoveryStep === i ? "w-12 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]" : discoveryStep > i ? "w-6 bg-black dark:bg-white" : "w-6 bg-slate-100 dark:bg-white/10"
-              }`} />
-            ))}
-          </div>
-          <button onClick={() => setFlowState("ENTRY")} className="p-3 bg-slate-50 dark:bg-white/5 rounded-full hover:bg-red-50 transition-colors group">
-            <X size={20} className="group-hover:text-red-500" />
-          </button>
+        <div className="flex gap-2 mb-12 pt-10">
+          {quizSteps.map(s => (
+            <div key={s.id} className={`h-2 flex-1 rounded-full transition-all duration-500 ${discoveryStep >= s.id ? "bg-orange-500 shadow-sm" : "bg-zinc-100 dark:bg-zinc-800"}`} />
+          ))}
         </div>
 
-        <div className="flex-1">
-          {/* STEP 1: 策略 (Strategy) - 白話版 */}
-          {discoveryStep === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-              <div className="mb-10">
-                <p className="text-orange-500 font-black tracking-[0.4em] text-[10px] uppercase mb-2 whitespace-nowrap">Step 01: Strategy</p>
-                <h2 className="text-4xl font-black italic tracking-tighter leading-none whitespace-nowrap">你喜歡哪種方式？</h2>
-                <p className="text-slate-400 text-xs font-bold mt-2 whitespace-nowrap">How do you want to play today?</p>
-              </div>
-              <div className="grid gap-4">
-                {[
-                  { title: "🚀 追正在漲的", desc: "現在誰強我就買誰，賺快錢", icon: <Zap size={20} className="text-yellow-500" /> },
-                  { title: "🦅 跟著大戶走", desc: "大戶買什麼我買什麼，搭順風車", icon: <TrendingUp size={20} className="text-blue-500" /> },
-                  { title: "⚓ 撿被錯殺的", desc: "跌深了總是會彈，撿個便宜", icon: <Anchor size={20} className="text-green-500" /> }
-                ].map((opt) => (
-                  <button 
-                    key={opt.title} 
-                    onClick={() => setDiscoveryStep(2)} 
-                    className="p-6 bg-white dark:bg-zinc-900 rounded-[30px] border-2 border-slate-100 dark:border-white/5 shadow-sm hover:border-black dark:hover:border-orange-500 text-left transition-all flex justify-between items-center group active:scale-95 relative overflow-hidden"
-                  >
-                    <div className="relative z-10">
-                      <div className="font-black text-xl mb-1 italic whitespace-nowrap flex items-center gap-2">
-                        {opt.title}
-                      </div>
-                      <div className="text-[11px] text-slate-400 font-bold uppercase whitespace-nowrap">{opt.desc}</div>
-                    </div>
-                    <div className="ml-4 bg-slate-50 dark:bg-white/5 p-3 rounded-full group-hover:bg-orange-500 group-hover:text-white transition-all shrink-0">
-                      <ArrowRight size={18} />
-                    </div>
-                  </button>
-                ))}
-              </div>
+        {currentQuiz ? (
+          <div className="animate-in slide-in-from-right-4 duration-500 flex-1">
+            <div className="flex items-center gap-2 mb-4">
+               <span className="w-8 h-[2px] bg-orange-500"></span>
+               <p className="text-orange-500 font-black text-[12px] uppercase tracking-widest">Question {currentQuiz.id}/09</p>
             </div>
-          )}
-
-          {/* STEP 2: 戰場 (Sector) - 白話版 */}
-          {discoveryStep === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-8 duration-700">
-              <div className="mb-10">
-                <p className="text-orange-500 font-black tracking-[0.4em] text-[10px] uppercase mb-2 whitespace-nowrap">Step 02: Sector</p>
-                <h2 className="text-4xl font-black italic tracking-tighter leading-none whitespace-nowrap">哪個領域讓你想了解？</h2>
-                <p className="text-slate-400 text-xs font-bold mt-2 whitespace-nowrap">Where do you think the money is?</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "AI 機器人", sub: "Chips & Tech", icon: <Cpu /> },
-                  { label: "虛擬貨幣", sub: "Crypto & Web3", icon: <Coins /> },
-                  { label: "避險資產", sub: "Safe Haven", icon: <Shield /> },
-                  { label: "能源軍工", sub: "Energy & War", icon: <Factory /> },
-                  { label: "生技醫療", sub: "Bio-Tech", icon: <Beaker /> },
-                  { label: "吃喝玩樂", sub: "Consumer", icon: <BarChart3 /> },
-                ].map((opt) => (
-                  <button 
-                    key={opt.label} 
-                    onClick={() => setDiscoveryStep(3)} 
-                    className="aspect-square bg-white dark:bg-zinc-900 border-2 border-slate-100 dark:border-white/5 rounded-[40px] shadow-sm hover:border-orange-500 flex flex-col items-center justify-center font-black transition-all group active:scale-95"
-                  >
-                    <div className="mb-3 text-slate-300 group-hover:text-orange-500 group-hover:scale-110 transition-all">
-                      {opt.icon}
-                    </div>
-                    <span className="italic text-xl tracking-tight whitespace-nowrap">{opt.label}</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 whitespace-nowrap">{opt.sub}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: 標的量級 (Weight Class) - 白話版 */}
-          {discoveryStep === 3 && (
-            <div className="animate-in fade-in slide-in-from-right-8 duration-700">
-              <div className="mb-10">
-                <p className="text-orange-500 font-black tracking-[0.4em] text-[10px] uppercase mb-2 whitespace-nowrap">Step 03: Risk</p>
-                <h2 className="text-4xl font-black italic tracking-tighter leading-none whitespace-nowrap">想要穩一點還是衝一點？</h2>
-                <p className="text-slate-400 text-xs font-bold mt-2 whitespace-nowrap">Pick your risk appetite</p>
-              </div>
-              <div className="grid gap-4">
-                {[
-                  { title: "🦍 大家都知道的大公司", desc: "穩穩賺，晚上睡得著 (Mega Cap)", icon: <Crown size={20} className="text-purple-500" /> },
-                  { title: "🐆 正在長大的潛力股", desc: "有點波動，但賺得比較多 (Growth)", icon: <Rabbit size={20} className="text-orange-500" /> },
-                  { title: "🦄 賭一個翻倍的機會", desc: "心臟要大顆，要嘛大賺要嘛歸零 (Small Cap)", icon: <Gem size={20} className="text-pink-500" /> }
-                ].map((opt) => (
-                  <button 
-                    key={opt.title} 
-                    onClick={() => setDiscoveryStep(4)} 
-                    className="p-6 bg-white dark:bg-zinc-900 rounded-[30px] border-2 border-slate-100 dark:border-white/5 shadow-sm hover:border-black dark:hover:border-orange-500 text-left transition-all flex justify-between items-center group active:scale-95 relative overflow-hidden"
-                  >
-                    <div className="relative z-10">
-                      <div className="font-black text-xl mb-1 italic whitespace-nowrap flex items-center gap-2">
-                        {opt.title}
-                      </div>
-                      <div className="text-[11px] text-slate-400 font-bold uppercase whitespace-nowrap">{opt.desc}</div>
-                    </div>
-                    <div className="ml-4 bg-slate-50 dark:bg-white/5 p-3 rounded-full group-hover:bg-orange-500 group-hover:text-white transition-all shrink-0">
-                      {opt.icon}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: 結果 (Results) */}
-          {discoveryStep === 4 && (
-            <div className="animate-in zoom-in-95 duration-700 text-center">
-              <div className="w-20 h-20 bg-white dark:bg-zinc-900 border-[6px] border-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl relative">
-                <Sparkles size={32} className="text-orange-500" />
-              </div>
-              <h2 className="text-4xl font-black italic mb-2 tracking-tighter whitespace-nowrap">AI 幫你找到了！</h2>
-              <p className="text-slate-400 font-bold mb-10 uppercase tracking-widest text-[10px] whitespace-nowrap">
-                Here are the best matches for you
-              </p>
-              
-              <div className="grid gap-3 mb-10">
-                {[
-                  { t: "NVDA", signal: "Strong Buy", reason: "大家都說好，大戶還在買" },
-                  { t: "MSTR", signal: "Accumulate", reason: "比特幣漲它就漲，很瘋" },
-                  { t: "AMD", signal: "Watch", reason: "雖然跌了點，但技術面剛轉強" }
-                ].map((item) => (
-                  <div key={item.t} className="p-5 bg-slate-50 dark:bg-zinc-900 rounded-[28px] border border-slate-100 dark:border-white/5 flex justify-between items-center group hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xl transition-all border-l-8 border-l-orange-500">
-                    <div className="text-left pl-2">
-                      <span className="font-black text-2xl block tracking-tighter italic leading-none">{item.t}</span>
-                      <div className="flex items-center gap-1 text-[9px] text-slate-500 font-bold mt-1 whitespace-nowrap">
-                         {item.reason}
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => router.push(`/new?ticker=${item.t}`)}
-                      className="bg-black dark:bg-white text-white dark:text-black px-5 py-3 rounded-2xl font-black text-xs hover:bg-orange-500 hover:text-white transition-all shadow-md active:scale-90 whitespace-nowrap"
-                    >
-                      看分析
-                    </button>
+            <h2 className="text-3xl font-black italic leading-tight mb-10 text-zinc-900 dark:text-white">
+              {currentQuiz.q}
+            </h2>
+            <div className="grid gap-4">
+              {currentQuiz.opts.map(opt => (
+                <button key={opt.id} onClick={() => handleSelect(opt.id)} className="group p-5 bg-white dark:bg-zinc-900 rounded-[24px] border-2 border-zinc-100 dark:border-zinc-800 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-100 dark:hover:shadow-none flex items-center gap-5 transition-all text-left">
+                  <div className="p-4 bg-zinc-50 dark:bg-black rounded-2xl group-hover:bg-orange-50 dark:group-hover:bg-orange-900/20 transition-colors text-zinc-900 dark:text-white">
+                    {opt.icon}
                   </div>
-                ))}
-              </div>
-              
-              <button 
-                onClick={() => setFlowState("ENTRY")} 
-                className="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em] hover:text-orange-500 transition-colors whitespace-nowrap"
-              >
-                Reset Search Criteria
-              </button>
+                  <div>
+                    <div className="font-black text-lg text-zinc-900 dark:text-white">{opt.t}</div>
+                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold mt-1 uppercase tracking-tight">{opt.d}</div>
+                  </div>
+                </button>
+              ))}
             </div>
-          )}
+          </div>
+        ) : (
+          <div className="text-center py-10 flex-1 flex flex-col items-center justify-center">
+            {isAnalyzing ? (
+              <div className="flex flex-col items-center">
+                <div className="relative mb-8">
+                  <Loader2 size={64} className="animate-spin text-orange-500 relative z-10"/>
+                  <div className="absolute inset-0 bg-orange-200 blur-2xl opacity-30 animate-pulse"></div>
+                </div>
+                <p className="font-black italic tracking-tighter text-2xl text-zinc-900 dark:text-white uppercase">AI 分析中</p>
+                <p className="text-[10px] text-zinc-400 mt-4 font-black uppercase tracking-[0.3em]">交叉檢索 9 項財務維度...</p>
+              </div>
+            ) : (
+              <div className="animate-in zoom-in-95 duration-700 w-full">
+                <div className="w-24 h-24 bg-zinc-900 dark:bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                  <Sparkles size={40} className="text-orange-500" />
+                </div>
+                <h2 className="text-4xl font-black italic mb-2 text-zinc-900 dark:text-white">匹配成功！</h2>
+                <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.4em] mb-12">Your Investment DNA</p>
+                
+                <div className="grid gap-4 mb-12">
+                  {getRecommendations().map(item => (
+                    <div key={item.t} className={`p-6 bg-white dark:bg-zinc-900 rounded-[32px] border-l-[12px] shadow-xl shadow-zinc-100 dark:shadow-none text-left ${item.color} border-y border-r border-zinc-100 dark:border-zinc-800`}>
+                       <span className="font-black text-3xl italic tracking-tighter text-zinc-900 dark:text-white">{item.t}</span>
+                       <p className="text-[12px] font-bold text-zinc-500 dark:text-zinc-400 uppercase mt-2 leading-relaxed">{item.reason}</p>
+                       <button onClick={() => router.push(`/new?ticker=${item.t}`)} className="mt-6 w-full py-4 bg-zinc-900 dark:bg-orange-500 text-white rounded-2xl font-black text-sm hover:scale-[1.02] transition-transform active:scale-95 shadow-lg">
+                         查看完整 AI 報告
+                       </button>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setDiscoveryStep(1)} className="text-zinc-400 font-black text-[11px] uppercase tracking-[0.2em] hover:text-orange-600 transition-colors">
+                  RETAKE DIAGNOSIS
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        
+        <div className="py-10">
+           <button onClick={() => setFlowState("ENTRY")} className="flex items-center gap-2 text-[11px] font-black text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-[0.2em] mx-auto">
+             <ChevronLeft size={16}/> BACK TO START
+           </button>
         </div>
       </div>
     </div>
